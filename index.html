@@ -16,16 +16,12 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;}
-
-/* LOGIN */
 .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:url('https://i.imgur.com/RYtgwMz.png') center/cover no-repeat;}
 .login-box{background:white;border-radius:16px;padding:40px;width:90%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
 .login-logo{font-size:3rem;text-align:center;margin-bottom:6px;}
 .login-title{font-size:1.6rem;font-weight:800;text-align:center;color:var(--green-dark);margin-bottom:4px;}
 .login-sub{text-align:center;color:var(--text-light);font-size:0.85rem;margin-bottom:24px;}
 .error-msg{color:var(--red);font-size:0.82rem;margin-top:10px;text-align:center;padding:8px;background:#fce4ec;border-radius:6px;}
-
-/* SIDEBAR */
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--green-dark);display:flex;flex-direction:column;z-index:100;transition:transform 0.3s;}
 .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
 .sidebar-logo h1{font-size:1.3rem;font-weight:800;color:var(--cream);}
@@ -45,23 +41,16 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text-da
 .clock-box{background:rgba(168,213,162,0.1);border-radius:8px;padding:8px 10px;}
 .clock-date{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--green-pale);letter-spacing:1px;}
 .clock-time{font-size:1.2rem;font-weight:800;color:var(--cream);}
-
-/* MAIN */
 .main{margin-left:230px;min-height:100vh;display:flex;flex-direction:column;}
 .topbar{background:white;border-bottom:2px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow);}
 .topbar-title{font-size:1.05rem;font-weight:800;color:var(--text-dark);}
 .topbar-right{display:flex;align-items:center;gap:10px;}
-.alert-badge{background:var(--red);color:white;border-radius:50%;width:26px;height:26px;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+.alert-badge{background:var(--red);color:white;border-radius:50%;width:26px;height:26px;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .content{padding:22px 24px;flex:1;}
 .mobile-menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--green-dark);color:white;border:none;border-radius:8px;width:36px;height:36px;font-size:1.1rem;cursor:pointer;}
-
-/* PAGES */
 .page{display:none;animation:fadeIn 0.2s ease;}
 .page.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-
-/* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
 .stat-card{background:white;border-radius:10px;padding:18px;border:1px solid var(--border);box-shadow:var(--shadow);position:relative;overflow:hidden;}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
@@ -72,17 +61,11 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text-da
 .stat-label{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;}
 .stat-value{font-size:2rem;font-weight:800;color:var(--text-dark);line-height:1;}
 .stat-sub{font-size:0.73rem;color:var(--text-light);margin-top:5px;}
-
-/* DASHBOARD GRID */
 .dashboard-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;}
-
-/* CARD */
 .card{background:white;border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px;}
 .card-header{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .card-title{font-size:0.92rem;font-weight:700;color:var(--text-dark);}
 .card-body{padding:14px 18px;}
-
-/* BUTTONS */
 .btn{padding:8px 16px;border-radius:7px;font-family:'Nunito',sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer;border:none;transition:all 0.18s;display:inline-flex;align-items:center;gap:5px;}
 .btn-primary{background:var(--green-mid);color:white;}
 .btn-primary:hover{background:var(--green-light);}
@@ -92,16 +75,12 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text-da
 .btn-amber{background:var(--amber);color:white;}
 .btn-sm{padding:4px 10px;font-size:0.76rem;}
 .btn-full{width:100%;padding:12px;font-size:1rem;margin-top:8px;justify-content:center;}
-
-/* FORM */
 .form-group{margin-bottom:13px;}
 .form-label{display:block;font-size:0.73rem;font-weight:700;color:var(--text-mid);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
 .form-control{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'Nunito',sans-serif;font-size:0.875rem;color:var(--text-dark);background:white;transition:border-color 0.2s;}
 .form-control:focus{outline:none;border-color:var(--green-light);box-shadow:0 0 0 3px rgba(74,140,63,0.1);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 textarea.form-control{resize:vertical;min-height:72px;}
-
-/* TABLE */
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
 .section-title{font-size:1.3rem;font-weight:800;color:var(--text-dark);}
 .search-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
@@ -115,8 +94,6 @@ tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(74,140,63,0.03);}
 .loading{text-align:center;padding:24px;color:var(--text-light);font-style:italic;}
 .action-btns{display:flex;gap:5px;flex-wrap:wrap;}
-
-/* BADGES */
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;}
 .b-lactatie{background:#e8f5e9;color:#2d5a27;border:1px solid #a8d5a2;}
 .b-gestanta{background:#fff8e1;color:#856404;border:1px solid #ffc107;}
@@ -127,22 +104,16 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 .b-vanduta{background:#eceff1;color:#546e7a;border:1px solid #b0bec5;}
 .b-mascul{background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;}
 .b-femela{background:#fce4ec;color:#880e4f;border:1px solid #f48fb1;}
-
-/* PROGRESS */
 .prog-wrap{min-width:90px;}
 .prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
 .prog-fill{height:100%;border-radius:3px;background:var(--green-light);}
 .prog-fill.warn{background:var(--amber);}
 .prog-fill.danger{background:var(--red);}
 .prog-info{font-size:0.7rem;color:var(--text-light);margin-top:2px;}
-
-/* TABS */
 .tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto;}
 .tab{padding:9px 18px;cursor:pointer;font-size:0.875rem;font-weight:700;color:var(--text-light);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;white-space:nowrap;}
 .tab:hover{color:var(--text-dark);}
 .tab.active{color:var(--green-mid);border-bottom-color:var(--green-mid);}
-
-/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(3px);}
 .modal-overlay.open{display:flex;}
 .modal{background:white;border-radius:12px;width:92%;max-width:600px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.25);animation:modalIn 0.25s ease;}
@@ -153,15 +124,11 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 .modal-close:hover{background:var(--cream-dark);}
 .modal-body{padding:18px 20px;}
 .modal-footer{padding:13px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:white;flex-wrap:wrap;}
-
-/* CONFIRM */
 .confirm-box{background:white;border-radius:12px;padding:28px;max-width:440px;width:92%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn 0.2s ease;}
 .confirm-icon{font-size:2.8rem;margin-bottom:12px;}
 .confirm-title{font-size:1.05rem;font-weight:800;margin-bottom:8px;}
 .confirm-text{font-size:0.875rem;color:var(--text-mid);line-height:1.5;margin-bottom:20px;}
 .confirm-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-
-/* ALERT ITEMS */
 .alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .alert-item:last-child{border-bottom:none;}
 .alert-dot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;}
@@ -171,8 +138,6 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 .alert-text{font-size:0.84rem;line-height:1.4;}
 .alert-sub{font-size:0.73rem;color:var(--text-light);margin-top:2px;}
 .alert-action{color:var(--red);font-weight:700;cursor:pointer;font-size:0.78rem;}
-
-/* MULS SLOTS */
 .muls-slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .muls-slot{border:2px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;}
 .muls-slot.done{border-color:var(--green-light);background:rgba(74,140,63,0.06);}
@@ -182,24 +147,12 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 .muls-slot-text{font-size:0.8rem;font-weight:700;}
 .muls-slot.done .muls-slot-text{color:var(--green-mid);}
 .muls-slot.pending .muls-slot-text{color:var(--amber);}
-
-/* CLEAN CHECK */
-.clean-check{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:7px;background:var(--cream);border:1px solid var(--border);font-size:0.82rem;cursor:pointer;margin-top:8px;font-weight:600;}
-.clean-check input{width:16px;height:16px;cursor:pointer;}
-.clean-check.checked{background:rgba(74,140,63,0.08);border-color:var(--green-light);}
-
-/* INFO BOX */
 .info-box{background:var(--cream);border:1px solid var(--border);border-radius:7px;padding:11px 14px;font-size:0.82rem;color:var(--text-mid);line-height:1.5;margin-top:10px;}
 .info-box.warning{background:#fff8e1;border-color:var(--amber);color:#856404;}
-.info-box.danger{background:#fce4ec;border-color:var(--red);color:#880e4f;}
-
-/* CALDURI URGENT BOX */
 .calduri-urgent{background:linear-gradient(135deg,#fce4ec,#ffebee);border:2px solid var(--red);border-radius:10px;padding:16px;margin-bottom:12px;}
 .calduri-urgent-title{font-weight:800;color:var(--red);font-size:0.95rem;margin-bottom:5px;}
 .calduri-warn{background:linear-gradient(135deg,#fff8e1,#fff3cd);border:2px solid var(--amber);border-radius:10px;padding:16px;margin-bottom:12px;}
 .calduri-warn-title{font-weight:800;color:var(--amber);font-size:0.95rem;margin-bottom:5px;}
-
-/* NOTIFICARI */
 .notif-container{position:fixed;top:68px;right:16px;z-index:3000;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:320px;}
 .notif{background:white;border-radius:10px;padding:13px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);display:flex;gap:10px;align-items:flex-start;border-left:4px solid var(--green-light);animation:notifIn 0.3s ease;pointer-events:all;}
 .notif.warn{border-left-color:var(--amber);}
@@ -207,8 +160,6 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 @keyframes notifIn{from{transform:translateX(16px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 .notif-title{font-weight:700;font-size:0.84rem;margin-bottom:2px;}
 .notif-text{font-size:0.77rem;color:var(--text-mid);}
-
-/* FISA VACA */
 .fisa-header{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:10px;padding:18px;color:white;margin-bottom:16px;display:flex;gap:16px;align-items:center;}
 .fisa-avatar{width:54px;height:54px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;}
 .fisa-name{font-size:1.2rem;font-weight:800;margin-bottom:3px;}
@@ -232,8 +183,6 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 .tag-vaccin{background:#f3e5f5;color:#6a1b9a;}
 .tag-tratament{background:#fff3e0;color:#e65100;}
 .tag-deparazitare{background:#e0f7fa;color:#006064;}
-
-/* RESPONSIVE */
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
@@ -244,15 +193,11 @@ tr:hover td{background:rgba(74,140,63,0.03);}
   .form-row{grid-template-columns:1fr;}
   .info-grid{grid-template-columns:1fr 1fr;}
 }
-@media(max-width:480px){
-  .stats-grid{grid-template-columns:1fr;}
-}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 <div id="app">
-
-<!-- LOGIN -->
 <div id="loginPage" class="login-page">
   <div class="login-box">
     <div class="login-logo">🐄</div>
@@ -271,16 +216,12 @@ tr:hover td{background:rgba(74,140,63,0.03);}
   </div>
 </div>
 
-<!-- APP -->
 <div id="mainApp" style="display:none">
   <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <span style="font-size:1.8rem">🐄</span>
-      <div>
-        <h1>FermaPro</h1>
-        <span>Fermă vaci de lapte</span>
-      </div>
+      <div><h1>FermaPro</h1><span>Fermă vaci de lapte</span></div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section-label">Principal</div>
@@ -296,10 +237,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
     <div class="sidebar-footer">
       <div class="user-info">
         <div style="font-size:1.5rem">👤</div>
-        <div>
-          <div class="user-name" id="userName">–</div>
-          <div class="user-role" id="userRole">–</div>
-        </div>
+        <div><div class="user-name" id="userName">–</div><div class="user-role" id="userRole">–</div></div>
       </div>
       <button class="btn-logout" onclick="doLogout()">Ieșire din cont</button>
       <div class="clock-box">
@@ -313,7 +251,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
     <div class="topbar">
       <div class="topbar-title" id="topbarTitle">📊 Dashboard</div>
       <div class="topbar-right">
-        <div class="alert-badge" id="alertBadge" onclick="showPage('alerte',null)" title="Alerte active">0</div>
+        <div class="alert-badge" id="alertBadge" onclick="showPage('alerte',null)">0</div>
         <button class="btn btn-primary btn-sm" onclick="openModal('modalAdaugaVaca')">+ Vacă nouă</button>
       </div>
     </div>
@@ -345,13 +283,10 @@ tr:hover td{background:rgba(74,140,63,0.03);}
           <div class="section-title">🥛 Muls & Curățenie</div>
           <button class="btn btn-primary" onclick="openModalMuls()">+ Înregistrează muls</button>
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">📅 Istoric mulsuri</div></div>
-          <div class="table-wrap"><table>
-            <thead><tr><th>Data</th><th>Dimineață</th><th>Curățenie dim.</th><th>Seară</th><th>Curățenie seară</th><th>Amiază</th><th>Confirmat de</th></tr></thead>
-            <tbody id="tblMulsuri"><tr><td colspan="7" class="loading">Se încarcă...</td></tr></tbody>
-          </table></div>
-        </div>
+        <div class="card"><div class="table-wrap"><table>
+          <thead><tr><th>Data</th><th>Dimineață</th><th>Curățenie dim.</th><th>Seară</th><th>Curățenie seară</th><th>Amiază</th><th>Confirmat de</th></tr></thead>
+          <tbody id="tblMulsuri"><tr><td colspan="7" class="loading">Se încarcă...</td></tr></tbody>
+        </table></div></div>
       </div>
 
       <!-- VACI -->
@@ -400,24 +335,18 @@ tr:hover td{background:rgba(74,140,63,0.03);}
           <div class="tab" onclick="switchTab(this,'tab-gestante')">Gestante</div>
           <div class="tab" onclick="switchTab(this,'tab-istoric-monte')">Istoric</div>
         </div>
-        <div id="tab-monte">
-          <div class="card"><div class="table-wrap"><table>
-            <thead><tr><th>Vacă</th><th>Data montei</th><th>Zile</th><th>Taur</th><th>21 zile (călduri)</th><th>30 zile (confirmare)</th><th>Stare</th><th>Acțiuni</th></tr></thead>
-            <tbody id="tblMonte"><tr><td colspan="8" class="loading">Se încarcă...</td></tr></tbody>
-          </table></div></div>
-        </div>
-        <div id="tab-gestante" style="display:none">
-          <div class="card"><div class="table-wrap"><table>
-            <thead><tr><th>Vacă</th><th>Data montei</th><th>Zile gestație</th><th>Progress</th><th>263 zile – maternitate</th><th>280 zile – fătare</th><th>Acțiuni</th></tr></thead>
-            <tbody id="tblGestante"><tr><td colspan="7" class="loading">Se încarcă...</td></tr></tbody>
-          </table></div></div>
-        </div>
-        <div id="tab-istoric-monte" style="display:none">
-          <div class="card"><div class="table-wrap"><table>
-            <thead><tr><th>Vacă</th><th>Data</th><th>Tip</th><th>Taur</th><th>Rezultat</th><th>Data fătare</th></tr></thead>
-            <tbody id="tblIstoricMonte"><tr><td colspan="6" class="loading">Se încarcă...</td></tr></tbody>
-          </table></div></div>
-        </div>
+        <div id="tab-monte"><div class="card"><div class="table-wrap"><table>
+          <thead><tr><th>Vacă</th><th>Data montei</th><th>Zile</th><th>Taur</th><th>21 zile</th><th>30 zile</th><th>Stare</th><th>Acțiuni</th></tr></thead>
+          <tbody id="tblMonte"><tr><td colspan="8" class="loading">Se încarcă...</td></tr></tbody>
+        </table></div></div></div>
+        <div id="tab-gestante" style="display:none"><div class="card"><div class="table-wrap"><table>
+          <thead><tr><th>Vacă</th><th>Data montei</th><th>Zile gestație</th><th>Progress</th><th>263 zile</th><th>280 zile</th><th>Acțiuni</th></tr></thead>
+          <tbody id="tblGestante"><tr><td colspan="7" class="loading">Se încarcă...</td></tr></tbody>
+        </table></div></div></div>
+        <div id="tab-istoric-monte" style="display:none"><div class="card"><div class="table-wrap"><table>
+          <thead><tr><th>Vacă</th><th>Data</th><th>Tip</th><th>Taur</th><th>Rezultat</th><th>Data fătare</th></tr></thead>
+          <tbody id="tblIstoricMonte"><tr><td colspan="6" class="loading">Se încarcă...</td></tr></tbody>
+        </table></div></div></div>
       </div>
 
       <!-- SANATATE -->
@@ -433,7 +362,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
           <div class="tab" onclick="switchTab(this,'tab-san-ist')">Istoric complet</div>
         </div>
         <div id="tab-trat"><div class="card"><div class="table-wrap"><table>
-          <thead><tr><th>Vacă</th><th>Diagnostic</th><th>Medicament</th><th>Doză</th><th>Start</th><th>Zile</th><th>Carantină lapte</th><th>Veterinar</th><th>Acțiuni</th></tr></thead>
+          <thead><tr><th>Vacă</th><th>Diagnostic</th><th>Medicament</th><th>Doză</th><th>Start</th><th>Zile</th><th>Carantină</th><th>Veterinar</th><th>Acțiuni</th></tr></thead>
           <tbody id="tblTrat"><tr><td colspan="9" class="loading">Se încarcă...</td></tr></tbody>
         </table></div></div></div>
         <div id="tab-vacc" style="display:none"><div class="card"><div class="table-wrap"><table>
@@ -461,18 +390,17 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 </div>
 </div>
 
-<!-- NOTIFICARI -->
 <div id="notifContainer" class="notif-container"></div>
 
 <!-- CONFIRM CALDURI -->
 <div class="modal-overlay" id="dlgCalduri">
   <div class="confirm-box">
     <div class="confirm-icon">🐄</div>
-    <div class="confirm-title">Confirmare obligatorie – 30 zile post-montă</div>
-    <div class="confirm-text" id="dlgCalduri-text">Vaca a manifestat semne de călduri în ultimele zile?</div>
+    <div class="confirm-title">Confirmare obligatorie – 30 zile</div>
+    <div class="confirm-text" id="dlgCalduri-text">Vaca a manifestat semne de călduri?</div>
     <div class="confirm-actions">
       <button class="btn btn-danger" onclick="raspundeCalduri(true)">🔴 Da, a avut călduri</button>
-      <button class="btn btn-primary" onclick="raspundeCalduri(false)">✅ Nu → Marchează gestantă</button>
+      <button class="btn btn-primary" onclick="raspundeCalduri(false)">✅ Nu → Gestantă</button>
     </div>
   </div>
 </div>
@@ -480,7 +408,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 <!-- MODAL ADAUGA VACA -->
 <div class="modal-overlay" id="modalAdaugaVaca">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">🐄 Adaugă vacă</div><button class="modal-close" onclick="closeModal('modalAdaugaVaca')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" id="titleAdaugaVaca">🐄 Adaugă vacă</div><button class="modal-close" onclick="closeModal('modalAdaugaVaca')">✕</button></div>
     <div class="modal-body">
       <div class="form-row">
         <div class="form-group"><label class="form-label">Număr crotal *</label><input type="text" id="v_crotal" class="form-control" placeholder="ex: #24"></div>
@@ -494,21 +422,45 @@ tr:hover td{background:rgba(74,140,63,0.03);}
         <div class="form-group"><label class="form-label">Nr. fătări actuale</label><input type="number" id="v_fatari" class="form-control" value="0" min="0"></div>
         <div class="form-group"><label class="form-label">Stare curentă</label>
           <select id="v_stare" class="form-control" onchange="toggleGestVaca()">
-            <option value="lactatie">Lactație</option>
-            <option value="gestanta">Gestantă</option>
-            <option value="uscata">Uscată</option>
-            <option value="maternitate">Maternitate</option>
+            <option value="lactatie">Lactație</option><option value="gestanta">Gestantă</option>
+            <option value="uscata">Uscată</option><option value="maternitate">Maternitate</option>
           </select>
         </div>
       </div>
       <div id="gestVacaSection" style="display:none">
-        <div class="form-group"><label class="form-label">Data montei (pentru calculul gestației)</label><input type="date" id="v_monta" class="form-control"></div>
+        <div class="form-group"><label class="form-label">Data montei</label><input type="date" id="v_monta" class="form-control"></div>
       </div>
       <div class="form-group"><label class="form-label">Observații</label><textarea id="v_obs" class="form-control" placeholder="Observații opționale..."></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalAdaugaVaca')">Anulează</button>
-      <button class="btn btn-primary" onclick="salveazaVaca()">💾 Salvează vaca</button>
+      <button class="btn btn-primary" id="btnSalveazaVaca" onclick="salveazaVaca()">💾 Salvează vaca</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADAUGA VITEL -->
+<div class="modal-overlay" id="modalAdaugaVitel">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><div class="modal-title">🐂 Adaugă vițel</div><button class="modal-close" onclick="closeModal('modalAdaugaVitel')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data nașterii *</label><input type="date" id="vit_data" class="form-control"></div>
+        <div class="form-group"><label class="form-label">Sex *</label><select id="vit_sex" class="form-control"><option value="femela">Femelă</option><option value="mascul">Mascul</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Mama (vaca)</label><select id="vit_mama" class="form-control"><option value="">Fără mamă înregistrată</option></select></div>
+        <div class="form-group"><label class="form-label">Tată / taur</label><input type="text" id="vit_tata" class="form-control" placeholder="ex: Holstein #A123"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Greutate la naștere (kg)</label><input type="number" id="vit_greutate" class="form-control" placeholder="ex: 38"></div>
+        <div class="form-group"><label class="form-label">Sănătate</label><select id="vit_sanatate" class="form-control"><option value="true">Sănătos</option><option value="false">Probleme</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Observații</label><textarea id="vit_obs" class="form-control" placeholder="Observații opționale..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalAdaugaVitel')">Anulează</button>
+      <button class="btn btn-primary" onclick="salveazaVitel()">💾 Salvează</button>
     </div>
   </div>
 </div>
@@ -527,7 +479,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
         <div class="form-group"><label class="form-label">Taur / Material seminal</label><input type="text" id="m_taur" class="form-control" placeholder="ex: Holstein Elite #A123"></div>
       </div>
       <div class="form-group"><label class="form-label">Observații</label><textarea id="m_obs" class="form-control" placeholder="Observații..."></textarea></div>
-      <div class="info-box">📅 Se programează automat: reminder la <strong>21 zile</strong> (posibile călduri), confirmare obligatorie la <strong>30 zile</strong>, transfer maternitate la <strong>263 zile</strong> și alertă fătare la <strong>280 zile</strong>.</div>
+      <div class="info-box">📅 Remindere automate: <strong>21 zile</strong> (călduri), <strong>30 zile</strong> (confirmare), <strong>263 zile</strong> (maternitate), <strong>280 zile</strong> (fătare).</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalMonta')">Anulează</button>
@@ -545,7 +497,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
         <div class="form-group"><label class="form-label">Data *</label><input type="date" id="mul_data" class="form-control"></div>
         <div class="form-group"><label class="form-label">Moment *</label><select id="mul_moment" class="form-control"><option value="dimineata">Dimineață</option><option value="amiaza">Amiază (post-fătare)</option><option value="seara">Seară</option></select></div>
       </div>
-      <div class="form-group"><label class="form-label">Aparatul de muls a fost curățat după muls? *</label>
+      <div class="form-group"><label class="form-label">Aparatul de muls a fost curățat? *</label>
         <select id="mul_curat" class="form-control"><option value="true">✅ Da, a fost curățat</option><option value="false">❌ Nu a fost curățat</option></select>
       </div>
       <div class="form-group"><label class="form-label">Confirmat de</label><input type="text" id="mul_confirmat" class="form-control" placeholder="Numele tău"></div>
@@ -581,9 +533,9 @@ tr:hover td{background:rgba(74,140,63,0.03);}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Veterinar</label><input type="text" id="t_vet" class="form-control" placeholder="Numele veterinarului"></div>
-        <div class="form-group"><label class="form-label">Data următoarei doze / revaccinări</label><input type="date" id="t_urmator" class="form-control"></div>
+        <div class="form-group"><label class="form-label">Data următoarei doze</label><input type="date" id="t_urmator" class="form-control"></div>
       </div>
-      <div class="form-group"><label class="form-label">Observații / Simptome</label><textarea id="t_obs" class="form-control" placeholder="Descrieți simptomele și evoluția..."></textarea></div>
+      <div class="form-group"><label class="form-label">Observații</label><textarea id="t_obs" class="form-control" placeholder="Descrieți simptomele..."></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalTratament')">Anulează</button>
@@ -599,43 +551,18 @@ tr:hover td{background:rgba(74,140,63,0.03);}
     <div class="modal-body" id="fisaBody"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalFisa')">Închide</button>
-      <button class="btn btn-danger btn-sm" id="btnVindeVaca" onclick="vindeVacaActiva()">🏷️ Marchează vândută</button>
+      <button class="btn btn-danger btn-sm" onclick="vindeVacaActiva()">🏷️ Marchează vândută</button>
       <button class="btn btn-primary" onclick="closeModal('modalFisa');openModalTratament()">+ Intervenție medicală</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL ADAUGA VITEL -->
-<div class="modal-overlay" id="modalAdaugaVitel">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header"><div class="modal-title">🐂 Adaugă vițel</div><button class="modal-close" onclick="closeModal('modalAdaugaVitel')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Data nașterii *</label><input type="date" id="vit_data" class="form-control"></div>
-        <div class="form-group"><label class="form-label">Sex *</label><select id="vit_sex" class="form-control"><option value="femela">Femelă</option><option value="mascul">Mascul</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Mama (vaca)</label><select id="vit_mama" class="form-control"><option value="">Fără mamă înregistrată</option></select></div>
-        <div class="form-group"><label class="form-label">Tată / taur</label><input type="text" id="vit_tata" class="form-control" placeholder="ex: Holstein #A123"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Greutate la naștere (kg)</label><input type="number" id="vit_greutate" class="form-control" placeholder="ex: 38"></div>
-        <div class="form-group"><label class="form-label">Sănătate</label><select id="vit_sanatate" class="form-control"><option value="true">Sănătos</option><option value="false">Probleme</option></select></div>
-      </div>
-      <div class="form-group"><label class="form-label">Observații</label><textarea id="vit_obs" class="form-control" placeholder="Observații opționale..."></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalAdaugaVitel')">Anulează</button>
-      <button class="btn btn-primary" onclick="salveazaVitel()">💾 Salvează</button>
-    </div>
-  </div>
-</div>
-  <!-- MODAL MODIFICA GESTATIE -->
+<!-- MODAL MODIFICA GESTATIE -->
 <div class="modal-overlay" id="modalModifGest">
   <div class="modal" style="max-width:460px">
     <div class="modal-header"><div class="modal-title">✏️ Modificare gestație</div><button class="modal-close" onclick="closeModal('modalModifGest')">✕</button></div>
     <div class="modal-body">
-      <div class="info-box warning">⚠️ Modificarea gestației este posibilă până în luna 8 (240 zile). Folosiți în caz de avort sau eroare de înregistrare.</div>
+      <div class="info-box warning">⚠️ Posibilă până în luna 8 (240 zile). Folosiți în caz de avort sau eroare.</div>
       <div class="form-group" style="margin-top:14px"><label class="form-label">Motiv</label>
         <select id="mg_motiv" class="form-control"><option value="avort">Avort</option><option value="eroare">Eroare dată montă</option><option value="altul">Altul</option></select>
       </div>
@@ -644,7 +571,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalModifGest')">Anulează</button>
-      <button class="btn btn-amber" onclick="salveazaModifGest()">✏️ Salvează modificarea</button>
+      <button class="btn btn-amber" onclick="salveazaModifGest()">✏️ Salvează</button>
     </div>
   </div>
 </div>
@@ -654,13 +581,9 @@ tr:hover td{background:rgba(74,140,63,0.03);}
   <div class="modal" style="max-width:460px">
     <div class="modal-header"><div class="modal-title">🐂 Confirmare stare vițel</div><button class="modal-close" onclick="closeModal('modalVitelVandut')">✕</button></div>
     <div class="modal-body">
-      <p style="margin-bottom:14px;color:var(--text-mid);font-size:0.875rem">Au trecut <strong>2 luni și jumătate</strong> de la nașterea vițelului. Confirmați ce s-a întâmplat cu acesta:</p>
+      <p style="margin-bottom:14px;color:var(--text-mid);font-size:0.875rem">Au trecut <strong>2 luni și jumătate</strong>. Confirmați starea vițelului:</p>
       <div class="form-group"><label class="form-label">Stare vițel</label>
-        <select id="vv_stare" class="form-control">
-          <option value="vandut">Vândut</option>
-          <option value="ramas">Rămâne în fermă (vițea)</option>
-          <option value="mort">Decedat</option>
-        </select>
+        <select id="vv_stare" class="form-control"><option value="vandut">Vândut</option><option value="ramas">Rămâne în fermă</option><option value="mort">Decedat</option></select>
       </div>
       <div class="form-group"><label class="form-label">Data</label><input type="date" id="vv_data" class="form-control"></div>
       <div class="form-group"><label class="form-label">Observații</label><textarea id="vv_obs" class="form-control" placeholder="Opțional..."></textarea></div>
@@ -673,9 +596,6 @@ tr:hover td{background:rgba(74,140,63,0.03);}
 </div>
 
 <script>
-// ============================================================
-// SUPABASE CONFIG
-// ============================================================
 const SUPA_URL = 'https://ksiqehbvjjflrjzcsjku.supabase.co';
 const SUPA_KEY = 'sb_publishable_cwofFiTCiA2wn0IX15UCGw_IX-ueEyA';
 const { createClient } = supabase;
@@ -684,11 +604,12 @@ const db = createClient(SUPA_URL, SUPA_KEY);
 let currentUser = null;
 let currentVacaId = null;
 let currentMontaId = null;
+let currentVitelId = null;
+let modifGestId = null;
+let calduriMontaId = null;
 let vaciList = [];
+let editMode = false;
 
-// ============================================================
-// CLOCK
-// ============================================================
 function updateClock() {
   const now = new Date();
   const zile = ['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
@@ -701,18 +622,21 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ============================================================
-// AUTH
-// ============================================================
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPassword').value;
+  const pass = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
-  if(!email || !pass){ showErr('Completați emailul și parola!'); return; }
+  if(!email||!pass){ showErr('Completați emailul și parola!'); return; }
   const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
   if(error){ showErr('Email sau parolă incorecte!'); return; }
   currentUser = data.user;
+  startApp(email);
+}
+
+function showErr(msg){ const e=document.getElementById('loginError'); e.textContent=msg; e.style.display='block'; }
+
+function startApp(email) {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('userName').textContent = email.split('@')[0];
@@ -720,58 +644,37 @@ async function doLogin() {
   initApp();
 }
 
-function showErr(msg){ const e=document.getElementById('loginError'); e.textContent=msg; e.style.display='block'; }
-
 async function doLogout() {
   await db.auth.signOut();
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
 }
 
-// Check session on load
 window.addEventListener('load', async () => {
   const { data:{ session } } = await db.auth.getSession();
-  if(session){
-    currentUser = session.user;
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    document.getElementById('userName').textContent = session.user.email.split('@')[0];
-    document.getElementById('userRole').textContent = 'Utilizator fermă';
-    initApp();
-  }
+  if(session){ currentUser = session.user; startApp(session.user.email); }
 });
 
-// ============================================================
-// INIT
-// ============================================================
 async function initApp() {
   await loadVaciList();
   await loadDashboard();
 }
 
 async function loadVaciList() {
-  const { data } = await db.from('vaci_lapte').select('id,nume,numar_crotal').eq('activ', true).order('nume');
+  const { data } = await db.from('vaci_lapte').select('id,nume,numar_crotal').eq('activ',true).order('nume');
   vaciList = data || [];
 }
 
-// ============================================================
-// NAVIGATION
-// ============================================================
-const pageTitles = {
-  dashboard:'📊 Dashboard', muls:'🥛 Muls & Curățenie', vaci:'🐄 Efectiv Vaci',
-  vitei:'🐂 Viței', reproductie:'🔄 Reproducție', sanatate:'💊 Sănătate', alerte:'🔔 Alerte'
-};
+const pageTitles = { dashboard:'📊 Dashboard', muls:'🥛 Muls & Curățenie', vaci:'🐄 Efectiv Vaci', vitei:'🐂 Viței', reproductie:'🔄 Reproducție', sanatate:'💊 Sănătate', alerte:'🔔 Alerte' };
 
 function showPage(name, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg = document.getElementById('page-'+name);
   if(pg) pg.classList.add('active');
   if(el) el.classList.add('active');
-  document.getElementById('topbarTitle').textContent = pageTitles[name] || name;
-  // Close mobile sidebar
+  document.getElementById('topbarTitle').textContent = pageTitles[name]||name;
   document.getElementById('sidebar').classList.remove('open');
-  // Load data
   if(name==='dashboard') loadDashboard();
   if(name==='muls') loadMulsuri();
   if(name==='vaci') loadVaci();
@@ -790,68 +693,41 @@ function switchTab(el, showId) {
   allTabs.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display=id===showId?'block':'none'; });
 }
 
-// ============================================================
-// HELPERS
-// ============================================================
 function today() { return new Date().toISOString().split('T')[0]; }
-function addDays(dateStr, n) { const d=new Date(dateStr); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
+function addDays(dateStr,n) { const d=new Date(dateStr); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
 function daysDiff(dateStr) { return Math.floor((new Date()-new Date(dateStr))/(1000*60*60*24)); }
 function formatDate(d) { if(!d) return '–'; const dt=new Date(d); return `${dt.getDate().toString().padStart(2,'0')}.${(dt.getMonth()+1).toString().padStart(2,'0')}.${dt.getFullYear()}`; }
 function getAge(an) { return new Date().getFullYear()-an; }
 
 function badgeStare(stare) {
-  const map = { lactatie:'b-lactatie', gestanta:'b-gestanta', uscata:'b-uscata',
-    maternitate:'b-maternitate', tratament:'b-tratament', montata:'b-montata', vanduta:'b-vanduta' };
-  const labels = { lactatie:'Lactație', gestanta:'Gestantă', uscata:'Uscată',
-    maternitate:'Maternitate', tratament:'Tratament', montata:'Montată', vanduta:'Vândută' };
+  const map={lactatie:'b-lactatie',gestanta:'b-gestanta',uscata:'b-uscata',maternitate:'b-maternitate',tratament:'b-tratament',montata:'b-montata',vanduta:'b-vanduta'};
+  const labels={lactatie:'Lactație',gestanta:'Gestantă',uscata:'Uscată',maternitate:'Maternitate',tratament:'Tratament',montata:'Montată',vanduta:'Vândută'};
   return `<span class="badge ${map[stare]||'b-lactatie'}">${labels[stare]||stare}</span>`;
 }
 
 function progGest(zile) {
-  const pct = Math.min(Math.round((zile/283)*100),100);
-  const cls = pct>=95?'danger':pct>=88?'warn':'';
+  const pct=Math.min(Math.round((zile/283)*100),100);
+  const cls=pct>=95?'danger':pct>=88?'warn':'';
   return `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill ${cls}" style="width:${pct}%"></div></div><div class="prog-info">${zile}/283 zile</div></div>`;
 }
 
-// ============================================================
-// DASHBOARD
-// ============================================================
 async function loadDashboard() {
-  // Stats
   const { count: totalVaci } = await db.from('vaci_lapte').select('*',{count:'exact',head:true}).eq('activ',true);
   const { count: gestante } = await db.from('vaci_lapte').select('*',{count:'exact',head:true}).eq('activ',true).eq('stare','gestanta');
   document.getElementById('s-vaci').textContent = totalVaci||0;
   document.getElementById('s-gestante').textContent = gestante||0;
-
-  // Mulsuri azi
-  const { data: mulsAzi } = await db.from('mulsuri').select('*').eq('data', today());
-  const nrMuls = mulsAzi ? mulsAzi.length : 0;
+  const { data: mulsAzi } = await db.from('mulsuri').select('*').eq('data',today());
+  const nrMuls = mulsAzi?mulsAzi.length:0;
   document.getElementById('s-mulsuri').textContent = `${nrMuls}/2`;
-
-  // Alerte
   const alerte = await calcAlerte();
   document.getElementById('s-alerte').textContent = alerte.length;
   document.getElementById('alertBadge').textContent = alerte.length;
   document.getElementById('navAlertCount').textContent = alerte.length;
-
-  // Dashboard alerte
   const daEl = document.getElementById('dashAlerte');
-  if(alerte.length === 0) {
-    daEl.innerHTML = '<div class="loading">✅ Nu există alerte active</div>';
-  } else {
-    daEl.innerHTML = alerte.slice(0,6).map(a=>`
-      <div class="alert-item">
-        <div class="alert-dot ${a.nivel}"></div>
-        <div>
-          <div class="alert-text"><strong>${a.vaca}</strong>: ${a.mesaj}</div>
-          <div class="alert-sub">${a.sub||''} ${a.actiune?`<span class="alert-action" onclick="${a.actiune}">→ Acțiune</span>`:''}</div>
-        </div>
-      </div>`).join('');
-  }
-
-  // Muls azi widget
-  const dim = mulsAzi && mulsAzi.find(m=>m.moment==='dimineata');
-  const sea = mulsAzi && mulsAzi.find(m=>m.moment==='seara');
+  if(alerte.length===0){ daEl.innerHTML='<div class="loading">✅ Nu există alerte active</div>'; }
+  else { daEl.innerHTML = alerte.slice(0,6).map(a=>`<div class="alert-item"><div class="alert-dot ${a.nivel}"></div><div><div class="alert-text"><strong>${a.vaca}</strong>: ${a.mesaj}</div><div class="alert-sub">${a.sub||''} ${a.actiune?`<span class="alert-action" onclick="${a.actiune}">→ Acțiune</span>`:''}</div></div></div>`).join(''); }
+  const dim = mulsAzi&&mulsAzi.find(m=>m.moment==='dimineata');
+  const sea = mulsAzi&&mulsAzi.find(m=>m.moment==='seara');
   document.getElementById('dashMuls').innerHTML = `
     <div class="muls-slots">
       <div class="muls-slot ${dim?'done':'pending'}" onclick="openModalMuls('dimineata')">
@@ -867,81 +743,49 @@ async function loadDashboard() {
         ${sea&&!sea.curatat_aparat?'<div style="color:var(--red);font-size:0.72rem;margin-top:4px">⚠️ Aparat necurățat!</div>':''}
       </div>
     </div>
-    <div style="margin-top:12px;font-size:0.78rem;color:var(--text-light);text-align:center">
-      Click pe slot pentru a înregistra mulsul
-    </div>`;
+    <div style="margin-top:12px;font-size:0.78rem;color:var(--text-light);text-align:center">Click pe slot pentru a înregistra mulsul</div>`;
 }
 
-// ============================================================
-// ALERTE ENGINE
-// ============================================================
 async function calcAlerte() {
   const alerte = [];
   const { data: monte } = await db.from('monte').select('*,vaci_lapte(nume,numar_crotal)').eq('fatare_finalizata',false);
   if(monte) {
     for(const m of monte) {
       const zile = daysDiff(m.data_monta);
-      const numeVaca = m.vaci_lapte?.nume || '–';
-      const crotal = m.vaci_lapte?.numar_crotal || '';
-      // 30 zile confirmare obligatorie
-      if(zile >= 30 && !m.gestanta_confirmata && m.a_avut_calduri_30 === null) {
-        alerte.push({ nivel:'red', vaca:`${crotal} – ${numeVaca}`, mesaj:`CONFIRMARE OBLIGATORIE – ${zile} zile de la montă`, sub:'A avut călduri?', actiune:`deschideCalduri('${m.id}','${numeVaca}')` });
-      }
-      // 21 zile posibile călduri
-      else if(zile >= 21 && zile < 30 && !m.gestanta_confirmata) {
-        alerte.push({ nivel:'amber', vaca:`${crotal} – ${numeVaca}`, mesaj:`Posibile călduri – ${zile} zile de la montă`, sub:'Monitorizați comportamentul azi' });
-      }
-      // 263 zile maternitate
-      if(m.gestanta_confirmata && zile >= 263 && zile < 280 && !m.transferata_maternitate) {
-        alerte.push({ nivel:'red', vaca:`${crotal} – ${numeVaca}`, mesaj:`263 zile gestație – Transfer la maternitate!`, sub:`Fătare estimată: ${formatDate(addDays(m.data_monta,283))}` });
-      }
-      // 280 zile fătare
-      if(m.gestanta_confirmata && zile >= 280 && !m.fatare_finalizata) {
-        alerte.push({ nivel:'red', vaca:`${crotal} – ${numeVaca}`, mesaj:`280 zile gestație – FĂTARE IMINENTĂ!`, sub:`Fătare estimată: ${formatDate(addDays(m.data_monta,283))}` });
-      }
+      const numeVaca = m.vaci_lapte?.nume||'–';
+      const crotal = m.vaci_lapte?.numar_crotal||'';
+      if(zile>=30&&!m.gestanta_confirmata&&m.a_avut_calduri_30===null)
+        alerte.push({nivel:'red',vaca:`${crotal} – ${numeVaca}`,mesaj:`CONFIRMARE OBLIGATORIE – ${zile} zile de la montă`,sub:'A avut călduri?',actiune:`deschideCalduri('${m.id}','${numeVaca}')`});
+      else if(zile>=21&&zile<30&&!m.gestanta_confirmata)
+        alerte.push({nivel:'amber',vaca:`${crotal} – ${numeVaca}`,mesaj:`Posibile călduri – ${zile} zile de la montă`,sub:'Monitorizați comportamentul azi'});
+      if(m.gestanta_confirmata&&zile>=263&&zile<280&&!m.transferata_maternitate)
+        alerte.push({nivel:'red',vaca:`${crotal} – ${numeVaca}`,mesaj:`263 zile – Transfer la maternitate!`,sub:`Fătare estimată: ${formatDate(addDays(m.data_monta,283))}`});
+      if(m.gestanta_confirmata&&zile>=280&&!m.fatare_finalizata)
+        alerte.push({nivel:'red',vaca:`${crotal} – ${numeVaca}`,mesaj:`280 zile – FĂTARE IMINENTĂ!`,sub:`Fătare estimată: ${formatDate(addDays(m.data_monta,283))}`});
     }
   }
-  // Vaci 7+ ani
   const { data: vaci7 } = await db.from('vaci_lapte').select('*').eq('activ',true);
-  if(vaci7) {
-    for(const v of vaci7) {
-      if(getAge(v.an_nastere) >= 7) {
-        alerte.push({ nivel:'amber', vaca:`${v.numar_crotal||''} – ${v.nume}`, mesaj:`${getAge(v.an_nastere)} ani – Randament scăzut, evaluați vânzarea/reforma`, sub:'Vaci peste 7 ani produc mai puțin' });
-      }
-    }
-  }
-  // Vaccinuri scadente
+  if(vaci7) for(const v of vaci7) if(getAge(v.an_nastere)>=7) alerte.push({nivel:'amber',vaca:`${v.numar_crotal||''} – ${v.nume}`,mesaj:`${getAge(v.an_nastere)} ani – Evaluați vânzarea/reforma`,sub:'Vaci peste 7 ani produc mai puțin'});
   const { data: vacc } = await db.from('sanatate').select('*,vaci_lapte(nume,numar_crotal)').eq('tip','vaccin').eq('finalizat',false);
-  if(vacc) {
-    for(const v of vacc) {
-      if(v.data_urmator && daysDiff(v.data_urmator) >= 0) {
-        alerte.push({ nivel:'amber', vaca:`${v.vaci_lapte?.numar_crotal||''} – ${v.vaci_lapte?.nume||'–'}`, mesaj:`Vaccin scadent: ${v.medicament}`, sub:`Scadent: ${formatDate(v.data_urmator)}` });
-      }
-    }
-  }
+  if(vacc) for(const v of vacc) if(v.data_urmator&&daysDiff(v.data_urmator)>=0) alerte.push({nivel:'amber',vaca:`${v.vaci_lapte?.numar_crotal||''} – ${v.vaci_lapte?.nume||'–'}`,mesaj:`Vaccin scadent: ${v.medicament}`,sub:`Scadent: ${formatDate(v.data_urmator)}`});
   return alerte;
 }
 
-// ============================================================
-// MULSURI
-// ============================================================
 async function loadMulsuri() {
-  const { data } = await db.from('mulsuri').select('*').order('data',{ascending:false}).order('moment').limit(30);
+  const { data } = await db.from('mulsuri').select('*').order('data',{ascending:false}).limit(30);
   const tbody = document.getElementById('tblMulsuri');
-  if(!data || data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există înregistrări</td></tr>'; return; }
-  // Group by date
+  if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există înregistrări</td></tr>'; return; }
   const byDate = {};
   data.forEach(m=>{ if(!byDate[m.data]) byDate[m.data]={}; byDate[m.data][m.moment]=m; });
-  tbody.innerHTML = Object.entries(byDate).map(([dt,slots])=>`
-    <tr>
-      <td><strong style="font-family:'IBM Plex Mono',monospace">${formatDate(dt)}</strong></td>
-      <td>${slots.dimineata?'✅':'–'}</td>
-      <td>${slots.dimineata?(slots.dimineata.curatat_aparat?'✅ Curățat':'<span style="color:var(--red)">⚠️ Omis</span>'):'–'}</td>
-      <td>${slots.seara?'✅':'–'}</td>
-      <td>${slots.seara?(slots.seara.curatat_aparat?'✅ Curățat':'<span style="color:var(--red)">⚠️ Omis</span>'):'–'}</td>
-      <td>${slots.amiaza?'✅':'–'}</td>
-      <td style="font-size:0.78rem;color:var(--text-light)">${slots.dimineata?.confirmat_de||slots.seara?.confirmat_de||'–'}</td>
-    </tr>`).join('');
+  tbody.innerHTML = Object.entries(byDate).map(([dt,slots])=>`<tr>
+    <td><strong style="font-family:'IBM Plex Mono',monospace">${formatDate(dt)}</strong></td>
+    <td>${slots.dimineata?'✅':'–'}</td>
+    <td>${slots.dimineata?(slots.dimineata.curatat_aparat?'✅':'<span style="color:var(--red)">⚠️ Omis</span>'):'–'}</td>
+    <td>${slots.seara?'✅':'–'}</td>
+    <td>${slots.seara?(slots.seara.curatat_aparat?'✅':'<span style="color:var(--red)">⚠️ Omis</span>'):'–'}</td>
+    <td>${slots.amiaza?'✅':'–'}</td>
+    <td style="font-size:0.78rem;color:var(--text-light)">${slots.dimineata?.confirmat_de||slots.seara?.confirmat_de||'–'}</td>
+  </tr>`).join('');
 }
 
 function openModalMuls(moment) {
@@ -953,38 +797,33 @@ function openModalMuls(moment) {
 async function salveazaMuls() {
   const data = document.getElementById('mul_data').value;
   const moment = document.getElementById('mul_moment').value;
-  const curat = document.getElementById('mul_curat').value === 'true';
+  const curat = document.getElementById('mul_curat').value==='true';
   const confirmat = document.getElementById('mul_confirmat').value;
   const obs = document.getElementById('mul_obs').value;
   if(!data||!moment){ notif('Completați data și momentul!','err'); return; }
   const { error } = await db.from('mulsuri').insert({ data, moment, efectuat:true, curatat_aparat:curat, confirmat_de:confirmat, observatii:obs });
   if(error){ notif('Eroare la salvare: '+error.message,'err'); return; }
   closeModal('modalMuls');
-  notif(curat?'Muls înregistrat și aparat curățat ✅':'Muls înregistrat ⚠️ Aparatul nu a fost curățat!', curat?'ok':'warn');
-  loadDashboard();
-  loadMulsuri();
+  notif(curat?'Muls înregistrat și aparat curățat ✅':'Muls înregistrat ⚠️ Aparatul nu a fost curățat!',curat?'ok':'warn');
+  loadDashboard(); loadMulsuri();
 }
 
-// ============================================================
-// VACI
-// ============================================================
 async function loadVaci() {
   const search = document.getElementById('searchVaci')?.value?.toLowerCase()||'';
-  const stare  = document.getElementById('filterStare')?.value||'';
+  const stare = document.getElementById('filterStare')?.value||'';
   let q = db.from('vaci_lapte').select('*').eq('activ',true).order('nume');
   if(stare) q = q.eq('stare',stare);
   const { data } = await q;
   const tbody = document.getElementById('tblVaci');
   if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există vaci înregistrate</td></tr>'; return; }
-  const filtered = data.filter(v=> !search || v.nume?.toLowerCase().includes(search) || v.numar_crotal?.toLowerCase().includes(search));
-  // Fetch gestatie data
+  const filtered = data.filter(v=>!search||v.nume?.toLowerCase().includes(search)||v.numar_crotal?.toLowerCase().includes(search));
   const { data: monte } = await db.from('monte').select('*').eq('gestanta_confirmata',true).eq('fatare_finalizata',false);
   tbody.innerHTML = filtered.map(v=>{
     const age = getAge(v.an_nastere||2020);
     const m = monte?.find(x=>x.vaca_id===v.id);
     let gestHtml = '–';
     if(m){ const z=daysDiff(m.data_monta); gestHtml=progGest(z); }
-    const warn7 = age>=7 ? '<span title="7+ ani" style="color:var(--amber)">⚠️</span>' : '';
+    const warn7 = age>=7?'<span title="7+ ani" style="color:var(--amber)">⚠️</span>':'';
     return `<tr>
       <td><strong style="font-family:'IBM Plex Mono',monospace">${v.numar_crotal||'–'}</strong></td>
       <td>${v.nume} ${warn7}</td>
@@ -993,15 +832,24 @@ async function loadVaci() {
       <td>${badgeStare(v.stare||'lactatie')}</td>
       <td>${gestHtml}</td>
       <td><div class="action-btns">
-        button class="btn btn-secondary btn-sm" onclick='openFisa(${JSON.stringify(v)})'>📋 Fișă</button>
-<button class="btn btn-amber btn-sm" onclick='openEditeaza(${JSON.stringify(v)})'>✏️ Editează</button>
-        ${m&&daysDiff(m.data_monta)<240?`<button class="btn btn-secondary btn-sm" onclick="openModifGest('${m.id}')">✏️</button>`:''}
+        <button class="btn btn-secondary btn-sm" onclick='openFisa(${JSON.stringify(v)})'>📋 Fișă</button>
+        <button class="btn btn-amber btn-sm" onclick='openEditeaza(${JSON.stringify(v)})'>✏️</button>
+        ${m&&daysDiff(m.data_monta)<240?`<button class="btn btn-secondary btn-sm" onclick="openModifGest('${m.id}')">📅</button>`:''}
       </div></td>
     </tr>`;
   }).join('');
 }
 
+function toggleGestVaca() {
+  const stare = document.getElementById('v_stare').value;
+  document.getElementById('gestVacaSection').style.display=(stare==='gestanta'||stare==='maternitate')?'block':'none';
+}
+
 function openEditeaza(v) {
+  editMode = true;
+  currentVacaId = v.id;
+  document.getElementById('titleAdaugaVaca').textContent = '✏️ Editează vacă';
+  document.getElementById('btnSalveazaVaca').textContent = '💾 Salvează modificările';
   document.getElementById('v_crotal').value = v.numar_crotal||'';
   document.getElementById('v_nume').value = v.nume||'';
   document.getElementById('v_rasa').value = v.rasa||'Holstein';
@@ -1009,58 +857,33 @@ function openEditeaza(v) {
   document.getElementById('v_fatari').value = v.nr_fatari||0;
   document.getElementById('v_stare').value = v.stare||'lactatie';
   document.getElementById('v_obs').value = v.observatii||'';
-  currentVacaId = v.id;
-  document.querySelector('#modalAdaugaVaca .modal-title').textContent = '✏️ Editează vacă';
-  document.querySelector('#modalAdaugaVaca .btn-primary').textContent = '💾 Salvează modificările';
-  document.querySelector('#modalAdaugaVaca .btn-primary').onclick = salveazaEditVaca;
+  toggleGestVaca();
   openModal('modalAdaugaVaca');
-}
-
-async function salveazaEditVaca() {
-  const crotal = document.getElementById('v_crotal').value.trim();
-  const nume   = document.getElementById('v_nume').value.trim();
-  const an     = parseInt(document.getElementById('v_an').value)||null;
-  if(!crotal||!nume||!an){ notif('Completați crotalul, numele și anul nașterii!','err'); return; }
-  const { error } = await db.from('vaci_lapte').update({
-    numar_crotal:crotal, nume, rasa:document.getElementById('v_rasa').value,
-    an_nastere:an, nr_fatari:parseInt(document.getElementById('v_fatari').value)||0,
-    stare:document.getElementById('v_stare').value,
-    observatii:document.getElementById('v_obs').value
-  }).eq('id', currentVacaId);
-  if(error){ notif('Eroare: '+error.message,'err'); return; }
-  closeModal('modalAdaugaVaca');
-  notif('Datele vacii au fost actualizate! ✅','ok');
-  await loadVaciList();
-  loadVaci();
-}
-  function toggleGestVaca() {
-  const stare = document.getElementById('v_stare').value;
-  document.getElementById('gestVacaSection').style.display = (stare==='gestanta'||stare==='maternitate')?'block':'none';
 }
 
 async function salveazaVaca() {
   const crotal = document.getElementById('v_crotal').value.trim();
-  const nume   = document.getElementById('v_nume').value.trim();
-  const an     = parseInt(document.getElementById('v_an').value)||null;
+  const nume = document.getElementById('v_nume').value.trim();
+  const an = parseInt(document.getElementById('v_an').value)||null;
   if(!crotal||!nume||!an){ notif('Completați crotalul, numele și anul nașterii!','err'); return; }
-  const obj = {
-    numar_crotal:crotal, nume, rasa:document.getElementById('v_rasa').value,
-    an_nastere:an, nr_fatari:parseInt(document.getElementById('v_fatari').value)||0,
-    stare:document.getElementById('v_stare').value, activ:true, categorie:'vaca',
-    observatii:document.getElementById('v_obs').value
-  };
-  const { error } = await db.from('vaci_lapte').insert(obj);
+  const obj = { numar_crotal:crotal, nume, rasa:document.getElementById('v_rasa').value, an_nastere:an, nr_fatari:parseInt(document.getElementById('v_fatari').value)||0, stare:document.getElementById('v_stare').value, observatii:document.getElementById('v_obs').value };
+  let error;
+  if(editMode && currentVacaId) {
+    const res = await db.from('vaci_lapte').update(obj).eq('id',currentVacaId);
+    error = res.error;
+  } else {
+    const res = await db.from('vaci_lapte').insert({...obj, activ:true, categorie:'vaca'});
+    error = res.error;
+  }
   if(error){ notif('Eroare: '+error.message,'err'); return; }
+  editMode = false; currentVacaId = null;
+  document.getElementById('titleAdaugaVaca').textContent = '🐄 Adaugă vacă';
+  document.getElementById('btnSalveazaVaca').textContent = '💾 Salvează vaca';
   closeModal('modalAdaugaVaca');
-  notif(`Vaca ${nume} a fost adăugată cu succes! 🐄`,'ok');
-  await loadVaciList();
-  loadVaci();
-  loadDashboard();
+  notif(editMode?'Date actualizate! ✅':`Vaca ${nume} salvată! 🐄`,'ok');
+  await loadVaciList(); loadVaci(); loadDashboard();
 }
 
-// ============================================================
-// VIȚEI
-// ============================================================
 async function loadVitei() {
   const { data: fatari } = await db.from('fatari').select('*,vaci_lapte(nume,numar_crotal)').order('data_fatare',{ascending:false});
   const tbody = document.getElementById('tblVitei');
@@ -1068,15 +891,12 @@ async function loadVitei() {
   tbody.innerHTML = fatari.map(f=>{
     const zileVarsta = daysDiff(f.data_fatare);
     const luni = Math.floor(zileVarsta/30);
-    let stareVitel = '';
-    let actiune = '';
+    let stareVitel='';
+    let actiune='';
     if(f.vitel_vandut){ stareVitel='<span class="badge b-vanduta">Vândut</span>'; }
-    else if(zileVarsta >= 75 && !f.vandut_confirmat){ // 2.5 luni
-      stareVitel='<span class="badge b-gestanta">⚠️ Confirmare necesară</span>';
-      actiune=`<button class="btn btn-amber btn-sm" onclick="openVitelVandut('${f.id}')">Confirmă stare</button>`;
-    } else if(zileVarsta >= 540 && f.sex_vitel==='femela' && !f.vitel_vandut){ // 18 luni
-      stareVitel='<span class="badge b-montata">🔔 Aptă montă</span>';
-    } else { stareVitel=`<span class="badge b-lactatie">${luni}l ${zileVarsta%30}z</span>`; }
+    else if(zileVarsta>=75&&!f.vandut_confirmat){ stareVitel='<span class="badge b-gestanta">⚠️ Confirmare</span>'; actiune=`<button class="btn btn-amber btn-sm" onclick="openVitelVandut('${f.id}')">Confirmă</button>`; }
+    else if(zileVarsta>=540&&f.sex_vitel==='femela'&&!f.vitel_vandut){ stareVitel='<span class="badge b-montata">🔔 Aptă montă</span>'; }
+    else { stareVitel=`<span class="badge b-lactatie">${luni}l ${zileVarsta%30}z</span>`; }
     return `<tr>
       <td>${formatDate(f.data_fatare)}</td>
       <td><span class="badge ${f.sex_vitel==='mascul'?'b-mascul':'b-femela'}">${f.sex_vitel==='mascul'?'🐂 Mascul':'🐄 Femelă'}</span></td>
@@ -1089,52 +909,45 @@ async function loadVitei() {
   }).join('');
 }
 
+async function openModalVitel() {
+  await loadVaciList();
+  const sel = document.getElementById('vit_mama');
+  sel.innerHTML = '<option value="">Fără mamă înregistrată</option>' + vaciList.map(v=>`<option value="${v.id}">${v.numar_crotal||''} – ${v.nume}</option>`).join('');
+  document.getElementById('vit_data').value = today();
+  openModal('modalAdaugaVitel');
+}
+
 async function salveazaVitel() {
   const data = document.getElementById('vit_data').value;
   const sex = document.getElementById('vit_sex').value;
   if(!data){ notif('Completați data nașterii!','err'); return; }
   const mamaId = document.getElementById('vit_mama').value;
   const { error } = await db.from('fatari').insert({
-    vaca_id: mamaId||null,
-    data_fatare: data,
-    sex_vitel: sex,
+    vaca_id: mamaId||null, data_fatare:data, sex_vitel:sex,
     greutate_vitel: parseFloat(document.getElementById('vit_greutate').value)||null,
     vitel_sanatos: document.getElementById('vit_sanatate').value==='true',
     informatii_tata: document.getElementById('vit_tata').value,
     observatii: document.getElementById('vit_obs').value,
-    vitel_vandut: false,
-    vitel_ramas_ferma: false
+    vitel_vandut:false, vitel_ramas_ferma:false
   });
   if(error){ notif('Eroare: '+error.message,'err'); return; }
-  const selMama = document.getElementById('vit_mama');
-  selMama.innerHTML = '<option value="">Fără mamă înregistrată</option>' + vaciList.map(v=><option value="${v.id}">${v.numar_crotal||''} – ${v.nume}</option>).join('');
   closeModal('modalAdaugaVitel');
   notif('Vițelul a fost adăugat! ✅','ok');
   loadVitei();
 }
 
-async function openModalVitel() {
-  await loadVaciList();
-  const sel = document.getElementById('vit_mama');
-  sel.innerHTML = '<option value="">Fără mamă înregistrată</option>' + vaciList.map(v=><option value="${v.id}">${v.numar_crotal||''} – ${v.nume}</option>).join('');
-  document.getElementById('vit_data').value = today();
-  openModal('modalAdaugaVitel');
-}
-  let currentVitelId = null;
 function openVitelVandut(id) { currentVitelId=id; document.getElementById('vv_data').value=today(); openModal('modalVitelVandut'); }
+
 async function salveazaStareVitel() {
   const stare = document.getElementById('vv_stare').value;
   const dt = document.getElementById('vv_data').value;
   const obs = document.getElementById('vv_obs').value;
-  await db.from('fatari').update({ vitel_vandut: stare==='vandut', vandut_confirmat:true, data_vanzare_vitel:dt, observatii:obs }).eq('id',currentVitelId);
+  await db.from('fatari').update({ vitel_vandut:stare==='vandut', vandut_confirmat:true, data_vanzare_vitel:dt, observatii:obs }).eq('id',currentVitelId);
   closeModal('modalVitelVandut');
   notif('Starea vițelului a fost actualizată!','ok');
   loadVitei();
 }
 
-// ============================================================
-// REPRODUCTIE
-// ============================================================
 async function openModalMonta() {
   await loadVaciList();
   const sel = document.getElementById('m_vaca');
@@ -1145,19 +958,14 @@ async function openModalMonta() {
 
 async function salveazaMonta() {
   const vacaId = document.getElementById('m_vaca').value;
-  const data   = document.getElementById('m_data').value;
-  const tip    = document.getElementById('m_tip').value;
-  const taur   = document.getElementById('m_taur').value;
-  const obs    = document.getElementById('m_obs').value;
+  const data = document.getElementById('m_data').value;
   if(!vacaId||!data){ notif('Selectați vaca și data montei!','err'); return; }
-  const { error } = await db.from('monte').insert({ vaca_id:vacaId, data_monta:data, tip_monta:tip, informatii_taur:taur, observatii:obs, gestanta_confirmata:false, fatare_finalizata:false });
+  const { error } = await db.from('monte').insert({ vaca_id:vacaId, data_monta:data, tip_monta:document.getElementById('m_tip').value, informatii_taur:document.getElementById('m_taur').value, observatii:document.getElementById('m_obs').value, gestanta_confirmata:false, fatare_finalizata:false });
   if(error){ notif('Eroare: '+error.message,'err'); return; }
-  // Update stare vaca
-  await db.from('vaci_lapte').update({ stare:'montata' }).eq('id',vacaId);
+  await db.from('vaci_lapte').update({stare:'montata'}).eq('id',vacaId);
   closeModal('modalMonta');
-  notif('Montă înregistrată! Remindere la 21 și 30 de zile programate automat 🔔','ok');
-  loadDashboard();
-  loadMonte();
+  notif('Montă înregistrată! Remindere programate automat 🔔','ok');
+  loadDashboard(); loadMonte();
 }
 
 async function loadMonte() {
@@ -1165,18 +973,16 @@ async function loadMonte() {
   const tbody = document.getElementById('tblMonte');
   if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="8" class="loading">Nu există monte active</td></tr>'; return; }
   tbody.innerHTML = data.map(m=>{
-    const z = daysDiff(m.data_monta);
-    const numeV = `${m.vaci_lapte?.numar_crotal||''} – ${m.vaci_lapte?.nume||'–'}`;
-    const d21 = addDays(m.data_monta,21);
-    const d30 = addDays(m.data_monta,30);
-    let stare = z>=30?`<span class="badge b-maternitate">🚨 Confirmare urgentă</span>`:z>=21?`<span class="badge b-tratament">⚠️ Călduri posibile</span>`:`<span class="badge b-lactatie">În așteptare</span>`;
+    const z=daysDiff(m.data_monta);
+    const numeV=`${m.vaci_lapte?.numar_crotal||''} – ${m.vaci_lapte?.nume||'–'}`;
+    let stare=z>=30?`<span class="badge b-maternitate">🚨 Confirmare</span>`:z>=21?`<span class="badge b-tratament">⚠️ Călduri</span>`:`<span class="badge b-lactatie">Așteptare</span>`;
     return `<tr>
       <td><strong>${numeV}</strong></td>
       <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">${formatDate(m.data_monta)}</td>
       <td><strong style="color:${z>=30?'var(--red)':z>=21?'var(--amber)':'inherit'}">${z}</strong></td>
       <td style="font-size:0.78rem">${m.informatii_taur||'–'}</td>
-      <td style="font-size:0.78rem">${z>=21?'<span style="color:var(--amber)">⚠️ Verificați</span>':formatDate(d21)}</td>
-      <td style="font-size:0.78rem">${z>=30?'<span style="color:var(--red);font-weight:700">🚨 ACUM</span>':formatDate(d30)}</td>
+      <td style="font-size:0.78rem">${z>=21?'<span style="color:var(--amber)">⚠️ Verificați</span>':formatDate(addDays(m.data_monta,21))}</td>
+      <td style="font-size:0.78rem">${z>=30?'<span style="color:var(--red);font-weight:700">🚨 ACUM</span>':formatDate(addDays(m.data_monta,30))}</td>
       <td>${stare}</td>
       <td><button class="btn btn-primary btn-sm" onclick="deschideCalduri('${m.id}','${m.vaci_lapte?.nume||''}')">Confirmă</button></td>
     </tr>`;
@@ -1186,10 +992,10 @@ async function loadMonte() {
 async function loadGestante() {
   const { data } = await db.from('monte').select('*,vaci_lapte(nume,numar_crotal)').eq('gestanta_confirmata',true).eq('fatare_finalizata',false).order('data_monta');
   const tbody = document.getElementById('tblGestante');
-  if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există vaci gestante înregistrate</td></tr>'; return; }
+  if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există vaci gestante</td></tr>'; return; }
   tbody.innerHTML = data.map(m=>{
-    const z = daysDiff(m.data_monta);
-    const numeV = `${m.vaci_lapte?.numar_crotal||''} – ${m.vaci_lapte?.nume||'–'}`;
+    const z=daysDiff(m.data_monta);
+    const numeV=`${m.vaci_lapte?.numar_crotal||''} – ${m.vaci_lapte?.nume||'–'}`;
     return `<tr>
       <td><strong>${numeV}</strong></td>
       <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">${formatDate(m.data_monta)}</td>
@@ -1197,9 +1003,7 @@ async function loadGestante() {
       <td>${progGest(z)}</td>
       <td style="font-size:0.78rem">${z>=263?'<span style="color:var(--red);font-weight:700">🚨 Transferați!</span>':formatDate(addDays(m.data_monta,263))}</td>
       <td style="font-size:0.78rem">${z>=280?'<span style="color:var(--red);font-weight:700">🔴 Iminentă!</span>':formatDate(addDays(m.data_monta,280))}</td>
-      <td><div class="action-btns">
-        ${z<240?`<button class="btn btn-secondary btn-sm" onclick="openModifGest('${m.id}')">✏️ Gestație</button>`:''}
-      </div></td>
+      <td>${z<240?`<button class="btn btn-secondary btn-sm" onclick="openModifGest('${m.id}')">✏️</button>`:''}</td>
     </tr>`;
   }).join('');
 }
@@ -1218,11 +1022,9 @@ async function loadIstoricMonte() {
   </tr>`).join('');
 }
 
-// CALDURI
-let calduriMontaId = null;
 function deschideCalduri(montaId, numeVaca) {
   calduriMontaId = montaId;
-  document.getElementById('dlgCalduri-text').textContent = `Vaca "${numeVaca}" – a manifestat semne de călduri în ultimele zile (30 zile de la montă)?`;
+  document.getElementById('dlgCalduri-text').textContent = `Vaca "${numeVaca}" – a manifestat semne de călduri în ultimele zile?`;
   openModal('dlgCalduri');
 }
 
@@ -1230,37 +1032,32 @@ async function raspundeCalduri(avutCalduri) {
   closeModal('dlgCalduri');
   if(!calduriMontaId) return;
   if(avutCalduri) {
-    await db.from('monte').update({ a_avut_calduri_30:true }).eq('id',calduriMontaId);
-    // Reset stare vaca
+    await db.from('monte').update({a_avut_calduri_30:true}).eq('id',calduriMontaId);
     const { data:m } = await db.from('monte').select('vaca_id').eq('id',calduriMontaId).single();
-    if(m) await db.from('vaci_lapte').update({ stare:'lactatie' }).eq('id',m.vaca_id);
-    notif('Vaca marcată ne-gestantă. Programați o nouă montă când e momentul.','warn');
+    if(m) await db.from('vaci_lapte').update({stare:'lactatie'}).eq('id',m.vaca_id);
+    notif('Vaca marcată ne-gestantă. Programați o nouă montă.','warn');
   } else {
-    await db.from('monte').update({ gestanta_confirmata:true, a_avut_calduri_30:false, data_confirmare:today() }).eq('id',calduriMontaId);
+    await db.from('monte').update({gestanta_confirmata:true,a_avut_calduri_30:false,data_confirmare:today()}).eq('id',calduriMontaId);
     const { data:m } = await db.from('monte').select('vaca_id').eq('id',calduriMontaId).single();
-    if(m) await db.from('vaci_lapte').update({ stare:'gestanta' }).eq('id',m.vaca_id);
+    if(m) await db.from('vaci_lapte').update({stare:'gestanta'}).eq('id',m.vaca_id);
     notif('✅ Vaca marcată GESTANTĂ! Remindere la 263 și 280 de zile programate.','ok');
   }
   loadDashboard(); loadMonte(); loadGestante(); loadVaci();
 }
 
-// MODIFICA GESTATIE
-let modifGestId = null;
 function openModifGest(id) { modifGestId=id; document.getElementById('mg_data').value=today(); openModal('modalModifGest'); }
+
 async function salveazaModifGest() {
   const novaData = document.getElementById('mg_data').value;
   const motiv = document.getElementById('mg_motiv').value;
   const obs = document.getElementById('mg_obs').value;
-  if(!novaData){ notif('Introduceți noua dată a montei!','err'); return; }
-  await db.from('monte').update({ data_monta:novaData, modificata:true, motiv_modificare:`${motiv}: ${obs}` }).eq('id',modifGestId);
+  if(!novaData){ notif('Introduceți noua dată!','err'); return; }
+  await db.from('monte').update({data_monta:novaData,modificata:true,motiv_modificare:`${motiv}: ${obs}`}).eq('id',modifGestId);
   closeModal('modalModifGest');
-  notif('Gestație modificată și salvată în istoric.','ok');
+  notif('Gestație modificată!','ok');
   loadGestante(); loadMonte();
 }
 
-// ============================================================
-// SANATATE
-// ============================================================
 async function openModalTratament() {
   await loadVaciList();
   const sel = document.getElementById('t_vaca');
@@ -1271,11 +1068,11 @@ async function openModalTratament() {
 
 async function salveazaTratament() {
   const vacaId = document.getElementById('t_vaca').value;
-  const tip    = document.getElementById('t_tip').value;
-  const data   = document.getElementById('t_data').value;
+  const tip = document.getElementById('t_tip').value;
+  const data = document.getElementById('t_data').value;
   if(!vacaId||!data){ notif('Selectați vaca și data!','err'); return; }
   const durata = parseInt(document.getElementById('t_durata').value)||null;
-  const dataSfarsit = durata ? addDays(data, durata) : null;
+  const dataSfarsit = durata?addDays(data,durata):null;
   const { error } = await db.from('sanatate').insert({
     vaca_id:vacaId, tip, data, diagnostic:document.getElementById('t_diag').value,
     medicament:document.getElementById('t_med').value, doza:document.getElementById('t_doza').value,
@@ -1284,108 +1081,71 @@ async function salveazaTratament() {
     observatii:document.getElementById('t_obs').value, finalizat:false, data_sfarsit:dataSfarsit
   });
   if(error){ notif('Eroare: '+error.message,'err'); return; }
-  if(tip==='tratament') await db.from('vaci_lapte').update({ stare:'tratament' }).eq('id',vacaId);
+  if(tip==='tratament') await db.from('vaci_lapte').update({stare:'tratament'}).eq('id',vacaId);
   closeModal('modalTratament');
-  notif('Înregistrare medicală salvată în istoricul vacii ✅','ok');
+  notif('Înregistrare medicală salvată ✅','ok');
   loadSanatate();
 }
 
 async function loadSanatate() {
   const { data } = await db.from('sanatate').select('*,vaci_lapte(nume,numar_crotal)').order('data',{ascending:false});
   if(!data) return;
-  const active = data.filter(x=>x.tip==='tratament'&&!x.finalizat);
-  const vacc   = data.filter(x=>x.tip==='vaccin');
-  const dep    = data.filter(x=>x.tip==='deparazitare');
-  const renderRow = (x) => {
-    const v = `${x.vaci_lapte?.numar_crotal||''} – ${x.vaci_lapte?.nume||'–'}`;
-    return { v, x };
-  };
-  document.getElementById('tblTrat').innerHTML = active.length?active.map(x=>{
-    const {v} = renderRow(x);
-    const z = x.durata_zile ? Math.min(daysDiff(x.data), x.durata_zile) : '–';
-    return `<tr><td><strong>${v}</strong></td><td>${x.diagnostic||'–'}</td><td>${x.medicament||'–'}</td><td>${x.doza||'–'}</td><td>${formatDate(x.data)}</td><td>${z}/${x.durata_zile||'?'}</td><td>${x.carantina_lapte_zile>0?`<span style="color:var(--red);font-weight:700">⛔ ${x.carantina_lapte_zile} zile</span>`:'–'}</td><td>${x.veterinar||'–'}</td><td><button class="btn btn-secondary btn-sm" onclick="finalizeazaTratament('${x.id}')">✅ Finalizat</button></td></tr>`;
+  const active=data.filter(x=>x.tip==='tratament'&&!x.finalizat);
+  const vacc=data.filter(x=>x.tip==='vaccin');
+  const dep=data.filter(x=>x.tip==='deparazitare');
+  const vName=x=>`${x.vaci_lapte?.numar_crotal||''} – ${x.vaci_lapte?.nume||'–'}`;
+  document.getElementById('tblTrat').innerHTML=active.length?active.map(x=>{
+    const z=x.durata_zile?Math.min(daysDiff(x.data),x.durata_zile):'–';
+    return `<tr><td><strong>${vName(x)}</strong></td><td>${x.diagnostic||'–'}</td><td>${x.medicament||'–'}</td><td>${x.doza||'–'}</td><td>${formatDate(x.data)}</td><td>${z}/${x.durata_zile||'?'}</td><td>${x.carantina_lapte_zile>0?`<span style="color:var(--red);font-weight:700">⛔ ${x.carantina_lapte_zile}z</span>`:'–'}</td><td>${x.veterinar||'–'}</td><td><button class="btn btn-secondary btn-sm" onclick="finalizeazaTratament('${x.id}')">✅</button></td></tr>`;
   }).join(''):'<tr><td colspan="9" class="loading">Nu există tratamente active</td></tr>';
-  document.getElementById('tblVacc').innerHTML = vacc.length?vacc.map(x=>{
-    const {v} = renderRow(x);
-    const scadent = x.data_urmator&&daysDiff(x.data_urmator)>=0;
-    return `<tr><td><strong>${v}</strong></td><td>${x.medicament||'–'}</td><td>${formatDate(x.data)}</td><td style="color:${scadent?'var(--red)':'inherit'}">${formatDate(x.data_urmator)} ${scadent?'⚠️':''}</td><td>${x.veterinar||'–'}</td></tr>`;
-  }).join(''):'<tr><td colspan="5" class="loading">Nu există vaccinuri înregistrate</td></tr>';
-  document.getElementById('tblDep').innerHTML = dep.length?dep.map(x=>{
-    const {v} = renderRow(x);
-    return `<tr><td><strong>${v}</strong></td><td>${x.medicament||'–'}</td><td>${formatDate(x.data)}</td><td>${x.doza||'–'}</td><td>${formatDate(x.data_urmator)}</td></tr>`;
-  }).join(''):'<tr><td colspan="5" class="loading">Nu există deparazitări înregistrate</td></tr>';
-  document.getElementById('tblSanIst').innerHTML = data.length?data.map(x=>{
-    const {v} = renderRow(x);
-    const tipColors = {tratament:'b-tratament',vaccin:'b-gestanta',deparazitare:'b-lactatie',consultatie:'b-uscata'};
-    return `<tr><td>${formatDate(x.data)}</td><td><strong>${v}</strong></td><td><span class="badge ${tipColors[x.tip]||'b-uscata'}">${x.tip}</span></td><td>${x.diagnostic||'–'}</td><td>${x.medicament||'–'}</td><td>${x.veterinar||'–'}</td></tr>`;
-  }).join(''):'<tr><td colspan="6" class="loading">Nu există înregistrări</td></tr>';
+  document.getElementById('tblVacc').innerHTML=vacc.length?vacc.map(x=>{
+    const sc=x.data_urmator&&daysDiff(x.data_urmator)>=0;
+    return `<tr><td><strong>${vName(x)}</strong></td><td>${x.medicament||'–'}</td><td>${formatDate(x.data)}</td><td style="color:${sc?'var(--red)':'inherit'}">${formatDate(x.data_urmator)} ${sc?'⚠️':''}</td><td>${x.veterinar||'–'}</td></tr>`;
+  }).join(''):'<tr><td colspan="5" class="loading">Nu există vaccinuri</td></tr>';
+  document.getElementById('tblDep').innerHTML=dep.length?dep.map(x=>`<tr><td><strong>${vName(x)}</strong></td><td>${x.medicament||'–'}</td><td>${formatDate(x.data)}</td><td>${x.doza||'–'}</td><td>${formatDate(x.data_urmator)}</td></tr>`).join(''):'<tr><td colspan="5" class="loading">Nu există deparazitări</td></tr>';
+  const tipC={tratament:'b-tratament',vaccin:'b-gestanta',deparazitare:'b-lactatie',consultatie:'b-uscata'};
+  document.getElementById('tblSanIst').innerHTML=data.length?data.map(x=>`<tr><td>${formatDate(x.data)}</td><td><strong>${vName(x)}</strong></td><td><span class="badge ${tipC[x.tip]||'b-uscata'}">${x.tip}</span></td><td>${x.diagnostic||'–'}</td><td>${x.medicament||'–'}</td><td>${x.veterinar||'–'}</td></tr>`).join(''):'<tr><td colspan="6" class="loading">Nu există înregistrări</td></tr>';
 }
 
 async function finalizeazaTratament(id) {
-  await db.from('sanatate').update({ finalizat:true }).eq('id',id);
-  notif('Tratament marcat ca finalizat ✅','ok');
+  await db.from('sanatate').update({finalizat:true}).eq('id',id);
+  notif('Tratament finalizat ✅','ok');
   loadSanatate();
 }
 
-// ============================================================
-// ALERTE PAGE
-// ============================================================
 async function loadAlerte() {
   const alerte = await calcAlerte();
   const cont = document.getElementById('alerteContainer');
-  if(alerte.length===0){ cont.innerHTML='<div class="card"><div class="card-body" style="text-align:center;padding:32px;color:var(--text-light)">✅ Nu există alerte active în acest moment</div></div>'; return; }
-  const urgente = alerte.filter(a=>a.nivel==='red');
-  const atentie = alerte.filter(a=>a.nivel==='amber');
-  let html = '';
-  if(urgente.length) {
-    html += urgente.map(a=>`
-      <div class="calduri-urgent">
-        <div class="calduri-urgent-title">🚨 ${a.vaca}</div>
-        <div style="font-size:0.875rem;color:var(--text-mid);margin-bottom:8px">${a.mesaj}</div>
-        <div style="font-size:0.78rem;color:var(--text-mid)">${a.sub||''}</div>
-        ${a.actiune?`<div style="margin-top:10px"><button class="btn btn-danger btn-sm" onclick="${a.actiune}">→ Acțiune necesară</button></div>`:''}
-      </div>`).join('');
-  }
-  if(atentie.length) {
-    html += atentie.map(a=>`
-      <div class="calduri-warn">
-        <div class="calduri-warn-title">⚠️ ${a.vaca}</div>
-        <div style="font-size:0.875rem;color:var(--text-mid)">${a.mesaj}</div>
-        <div style="font-size:0.78rem;color:var(--text-mid);margin-top:4px">${a.sub||''}</div>
-      </div>`).join('');
-  }
+  if(alerte.length===0){ cont.innerHTML='<div class="card"><div class="card-body" style="text-align:center;padding:32px;color:var(--text-light)">✅ Nu există alerte active</div></div>'; return; }
+  const urgente=alerte.filter(a=>a.nivel==='red');
+  const atentie=alerte.filter(a=>a.nivel==='amber');
+  let html='';
+  if(urgente.length) html+=urgente.map(a=>`<div class="calduri-urgent"><div class="calduri-urgent-title">🚨 ${a.vaca}</div><div style="font-size:0.875rem;color:var(--text-mid);margin-bottom:8px">${a.mesaj}</div><div style="font-size:0.78rem;color:var(--text-mid)">${a.sub||''}</div>${a.actiune?`<div style="margin-top:10px"><button class="btn btn-danger btn-sm" onclick="${a.actiune}">→ Acțiune necesară</button></div>`:''}</div>`).join('');
+  if(atentie.length) html+=atentie.map(a=>`<div class="calduri-warn"><div class="calduri-warn-title">⚠️ ${a.vaca}</div><div style="font-size:0.875rem;color:var(--text-mid)">${a.mesaj}</div><div style="font-size:0.78rem;color:var(--text-mid);margin-top:4px">${a.sub||''}</div></div>`).join('');
   cont.innerHTML = html;
 }
 
-// ============================================================
-// FISA VACA
-// ============================================================
 async function openFisa(v) {
   currentVacaId = v.id;
-  document.getElementById('fisaTitle').textContent = `📋 Fișă – ${v.numar_crotal||''} – ${v.nume}`;
+  document.getElementById('fisaTitle').textContent = `📋 ${v.numar_crotal||''} – ${v.nume}`;
   const age = getAge(v.an_nastere||2020);
-  // Load history
   const { data: monte } = await db.from('monte').select('*').eq('vaca_id',v.id).order('data_monta',{ascending:false});
   const { data: sanat } = await db.from('sanatate').select('*').eq('vaca_id',v.id).order('data',{ascending:false});
   const { data: fatar } = await db.from('fatari').select('*').eq('vaca_id',v.id).order('data_fatare',{ascending:false});
-  let gestInfo = '';
   const mActiva = monte?.find(m=>!m.fatare_finalizata);
-  if(mActiva) { const z=daysDiff(mActiva.data_monta); gestInfo=`${z} zile gestație`; }
+  const gestInfo = mActiva?`${daysDiff(mActiva.data_monta)} zile gestație`:'';
   document.getElementById('fisaBody').innerHTML = `
-    <div class="fisa-header">
-      <div class="fisa-avatar">🐄</div>
-      <div>
-        <div class="fisa-name">${v.numar_crotal||''} – ${v.nume}</div>
-        <div class="fisa-meta">Rasă: ${v.rasa||'–'} · Înregistrată: ${v.an_nastere||'–'}</div>
-        <div class="fisa-badges">
-          <span class="fisa-badge">Vârstă: ${age} ani</span>
-          <span class="fisa-badge">Fătări: ${v.nr_fatari||0}</span>
-          <span class="fisa-badge">${v.stare||'–'}</span>
-          ${gestInfo?`<span class="fisa-badge">${gestInfo}</span>`:''}
-          ${age>=7?'<span class="fisa-badge" style="background:rgba(200,134,10,0.3)">⚠️ 7+ ani</span>':''}
-        </div>
+    <div class="fisa-header"><div class="fisa-avatar">🐄</div><div>
+      <div class="fisa-name">${v.numar_crotal||''} – ${v.nume}</div>
+      <div class="fisa-meta">Rasă: ${v.rasa||'–'} · ${v.an_nastere||'–'}</div>
+      <div class="fisa-badges">
+        <span class="fisa-badge">Vârstă: ${age} ani</span>
+        <span class="fisa-badge">Fătări: ${v.nr_fatari||0}</span>
+        <span class="fisa-badge">${v.stare||'–'}</span>
+        ${gestInfo?`<span class="fisa-badge">${gestInfo}</span>`:''}
+        ${age>=7?'<span class="fisa-badge" style="background:rgba(200,134,10,0.3)">⚠️ 7+ ani</span>':''}
       </div>
-    </div>
+    </div></div>
     <div class="info-grid">
       <div class="info-item"><div class="info-item-label">An naștere</div><div class="info-item-value">${v.an_nastere||'–'}</div></div>
       <div class="info-item"><div class="info-item-label">Vârstă</div><div class="info-item-value">${age} ani</div></div>
@@ -1395,65 +1155,36 @@ async function openFisa(v) {
       <div class="info-item"><div class="info-item-label">Crotal</div><div class="info-item-value">${v.numar_crotal||'–'}</div></div>
     </div>
     <div class="subsec-title">📅 Reproducție <button class="btn btn-primary btn-sm" onclick="closeModal('modalFisa');openModalMonta()">+ Montă</button></div>
-    <div>${monte&&monte.length?monte.map(m=>`
-      <div class="timeline-item">
-        <div class="tl-dot" style="background:var(--blue)"></div>
-        <div class="tl-date">${formatDate(m.data_monta)}</div>
-        <div><div class="tl-title"><span class="tag tag-monta">Montă</span> ${m.tip_monta||'–'} · ${m.informatii_taur||'–'}</div>
-        <div class="tl-detail">${m.gestanta_confirmata?'✅ Gestantă confirmată':m.a_avut_calduri_30?'🔴 Ne-gestantă':'⏳ În așteptare confirmare'} · ${m.fatare_finalizata?`Fătare: ${formatDate(m.data_fatare_reala)}`:'–'}</div></div>
-      </div>`).join(''):'<div style="color:var(--text-light);font-size:0.82rem">Nu există monte înregistrate</div>'}</div>
+    <div>${monte&&monte.length?monte.map(m=>`<div class="timeline-item"><div class="tl-dot" style="background:var(--blue)"></div><div class="tl-date">${formatDate(m.data_monta)}</div><div><div class="tl-title"><span class="tag tag-monta">Montă</span> ${m.tip_monta||'–'} · ${m.informatii_taur||'–'}</div><div class="tl-detail">${m.gestanta_confirmata?'✅ Gestantă':m.a_avut_calduri_30?'🔴 Ne-gestantă':'⏳ Așteptare'}</div></div></div>`).join(''):'<div style="color:var(--text-light);font-size:0.82rem;padding:8px 0">Nu există monte înregistrate</div>'}</div>
     <div class="subsec-title">🍼 Fătări</div>
-    <div>${fatar&&fatar.length?fatar.map(f=>`
-      <div class="timeline-item">
-        <div class="tl-dot" style="background:var(--red)"></div>
-        <div class="tl-date">${formatDate(f.data_fatare)}</div>
-        <div><div class="tl-title"><span class="tag tag-fatare">Fătare</span> ${f.tip_fatare||'normală'}</div>
-        <div class="tl-detail">Vițel ${f.sex_vitel||'–'} · ${f.greutate_vitel?f.greutate_vitel+'kg':'greutate nespec.'} · ${f.vitel_vandut?'Vândut':'În fermă'}</div></div>
-      </div>`).join(''):'<div style="color:var(--text-light);font-size:0.82rem">Nu există fătări înregistrate</div>'}</div>
+    <div>${fatar&&fatar.length?fatar.map(f=>`<div class="timeline-item"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-date">${formatDate(f.data_fatare)}</div><div><div class="tl-title"><span class="tag tag-fatare">Fătare</span> ${f.tip_fatare||'normală'}</div><div class="tl-detail">Vițel ${f.sex_vitel||'–'} · ${f.greutate_vitel?f.greutate_vitel+'kg':''} · ${f.vitel_vandut?'Vândut':'În fermă'}</div></div></div>`).join(''):'<div style="color:var(--text-light);font-size:0.82rem;padding:8px 0">Nu există fătări înregistrate</div>'}</div>
     <div class="subsec-title">💊 Istoric medical <button class="btn btn-primary btn-sm" onclick="closeModal('modalFisa');openModalTratament()">+ Adaugă</button></div>
-    <div>${sanat&&sanat.length?sanat.map(s=>{
-      const tagCls = {tratament:'tag-tratament',vaccin:'tag-vaccin',deparazitare:'tag-deparazitare',consultatie:'tag-monta'};
-      return `<div class="timeline-item">
-        <div class="tl-dot" style="background:var(--amber)"></div>
-        <div class="tl-date">${formatDate(s.data)}</div>
-        <div><div class="tl-title"><span class="tag ${tagCls[s.tip]||'tag-monta'}">${s.tip}</span> ${s.diagnostic||s.medicament||'–'}</div>
-        <div class="tl-detail">${s.medicament?s.medicament+' · ':''} ${s.doza||''} ${s.veterinar?'· Dr. '+s.veterinar:''}</div></div>
-      </div>`;
-    }).join(''):'<div style="color:var(--text-light);font-size:0.82rem">Nu există înregistrări medicale</div>'}</div>
-    ${v.observatii?`<div class="info-box" style="margin-top:14px"><strong>Observații:</strong> ${v.observatii}</div>`:''}
-  `;
+    <div>${sanat&&sanat.length?sanat.map(s=>{const tc={tratament:'tag-tratament',vaccin:'tag-vaccin',deparazitare:'tag-deparazitare',consultatie:'tag-monta'};return`<div class="timeline-item"><div class="tl-dot" style="background:var(--amber)"></div><div class="tl-date">${formatDate(s.data)}</div><div><div class="tl-title"><span class="tag ${tc[s.tip]||'tag-monta'}">${s.tip}</span> ${s.diagnostic||s.medicament||'–'}</div><div class="tl-detail">${s.medicament?s.medicament+' · ':''} ${s.doza||''} ${s.veterinar?'· Dr. '+s.veterinar:''}</div></div></div>`;}).join(''):'<div style="color:var(--text-light);font-size:0.82rem;padding:8px 0">Nu există înregistrări medicale</div>'}</div>
+    ${v.observatii?`<div class="info-box" style="margin-top:14px"><strong>Observații:</strong> ${v.observatii}</div>`:''}`;
   openModal('modalFisa');
 }
 
 async function vindeVacaActiva() {
   if(!currentVacaId) return;
-  if(!confirm('Sigur marcați această vacă ca vândută? Va fi scoasă din efectivul activ.')) return;
-  await db.from('vaci_lapte').update({ activ:false, stare:'vanduta', data_vanzare:today() }).eq('id',currentVacaId);
+  if(!confirm('Sigur marcați această vacă ca vândută?')) return;
+  await db.from('vaci_lapte').update({activ:false,stare:'vanduta',data_vanzare:today()}).eq('id',currentVacaId);
   closeModal('modalFisa');
-  notif('Vaca a fost marcată ca vândută și scoasă din efectiv.','ok');
+  notif('Vaca marcată ca vândută și scoasă din efectiv.','ok');
   loadVaci(); loadDashboard();
 }
 
-// ============================================================
-// MODAL HELPERS
-// ============================================================
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click', e=>{ if(e.target===o) o.classList.remove('open'); });
-});
+document.querySelectorAll('.modal-overlay').forEach(o=>{ o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }); });
 
-// ============================================================
-// NOTIFICARI
-// ============================================================
-function notif(text, type='ok') {
-  const c = document.getElementById('notifContainer');
-  const n = document.createElement('div');
-  n.className = `notif ${type==='warn'?'warn':type==='err'?'err':''}`;
-  const icons = {ok:'✅', warn:'⚠️', err:'❌'};
-  n.innerHTML = `<div style="font-size:1.2rem">${icons[type]||'ℹ️'}</div><div><div class="notif-title">FermaPro</div><div class="notif-text">${text}</div></div>`;
+function notif(text,type='ok') {
+  const c=document.getElementById('notifContainer');
+  const n=document.createElement('div');
+  n.className=`notif ${type==='warn'?'warn':type==='err'?'err':''}`;
+  const icons={ok:'✅',warn:'⚠️',err:'❌'};
+  n.innerHTML=`<div style="font-size:1.2rem">${icons[type]||'ℹ️'}</div><div><div class="notif-title">FermaPro</div><div class="notif-text">${text}</div></div>`;
   c.appendChild(n);
-  setTimeout(()=>{ n.style.opacity='0'; n.style.transform='translateX(14px)'; n.style.transition='all 0.3s'; setTimeout(()=>n.remove(),300); }, 4500);
+  setTimeout(()=>{ n.style.opacity='0'; n.style.transform='translateX(14px)'; n.style.transition='all 0.3s'; setTimeout(()=>n.remove(),300); },4500);
 }
 </script>
 </body>
