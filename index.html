@@ -1089,7 +1089,38 @@ async function loadVitei() {
   }).join('');
 }
 
-let currentVitelId = null;
+async function salveazaVitel() {
+  const data = document.getElementById('vit_data').value;
+  const sex = document.getElementById('vit_sex').value;
+  if(!data){ notif('Completați data nașterii!','err'); return; }
+  const mamaId = document.getElementById('vit_mama').value;
+  const { error } = await db.from('fatari').insert({
+    vaca_id: mamaId||null,
+    data_fatare: data,
+    sex_vitel: sex,
+    greutate_vitel: parseFloat(document.getElementById('vit_greutate').value)||null,
+    vitel_sanatos: document.getElementById('vit_sanatate').value==='true',
+    informatii_tata: document.getElementById('vit_tata').value,
+    observatii: document.getElementById('vit_obs').value,
+    vitel_vandut: false,
+    vitel_ramas_ferma: false
+  });
+  if(error){ notif('Eroare: '+error.message,'err'); return; }
+  const selMama = document.getElementById('vit_mama');
+  selMama.innerHTML = '<option value="">Fără mamă înregistrată</option>' + vaciList.map(v=><option value="${v.id}">${v.numar_crotal||''} – ${v.nume}</option>).join('');
+  closeModal('modalAdaugaVitel');
+  notif('Vițelul a fost adăugat! ✅','ok');
+  loadVitei();
+}
+
+async function openModalVitel() {
+  await loadVaciList();
+  const sel = document.getElementById('vit_mama');
+  sel.innerHTML = '<option value="">Fără mamă înregistrată</option>' + vaciList.map(v=><option value="${v.id}">${v.numar_crotal||''} – ${v.nume}</option>).join('');
+  document.getElementById('vit_data').value = today();
+  openModal('modalAdaugaVitel');
+}
+  let currentVitelId = null;
 function openVitelVandut(id) { currentVitelId=id; document.getElementById('vv_data').value=today(); openModal('modalVitelVandut'); }
 async function salveazaStareVitel() {
   const stare = document.getElementById('vv_stare').value;
