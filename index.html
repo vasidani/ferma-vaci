@@ -975,7 +975,39 @@ async function loadVaci() {
   }).join('');
 }
 
-function toggleGestVaca() {
+function openEditeaza(v) {
+  document.getElementById('v_crotal').value = v.numar_crotal||'';
+  document.getElementById('v_nume').value = v.nume||'';
+  document.getElementById('v_rasa').value = v.rasa||'Holstein';
+  document.getElementById('v_an').value = v.an_nastere||'';
+  document.getElementById('v_fatari').value = v.nr_fatari||0;
+  document.getElementById('v_stare').value = v.stare||'lactatie';
+  document.getElementById('v_obs').value = v.observatii||'';
+  currentVacaId = v.id;
+  document.querySelector('#modalAdaugaVaca .modal-title').textContent = '✏️ Editează vacă';
+  document.querySelector('#modalAdaugaVaca .btn-primary').textContent = '💾 Salvează modificările';
+  document.querySelector('#modalAdaugaVaca .btn-primary').onclick = salveazaEditVaca;
+  openModal('modalAdaugaVaca');
+}
+
+async function salveazaEditVaca() {
+  const crotal = document.getElementById('v_crotal').value.trim();
+  const nume   = document.getElementById('v_nume').value.trim();
+  const an     = parseInt(document.getElementById('v_an').value)||null;
+  if(!crotal||!nume||!an){ notif('Completați crotalul, numele și anul nașterii!','err'); return; }
+  const { error } = await db.from('vaci_lapte').update({
+    numar_crotal:crotal, nume, rasa:document.getElementById('v_rasa').value,
+    an_nastere:an, nr_fatari:parseInt(document.getElementById('v_fatari').value)||0,
+    stare:document.getElementById('v_stare').value,
+    observatii:document.getElementById('v_obs').value
+  }).eq('id', currentVacaId);
+  if(error){ notif('Eroare: '+error.message,'err'); return; }
+  closeModal('modalAdaugaVaca');
+  notif('Datele vacii au fost actualizate! ✅','ok');
+  await loadVaciList();
+  loadVaci();
+}
+  function toggleGestVaca() {
   const stare = document.getElementById('v_stare').value;
   document.getElementById('gestVacaSection').style.display = (stare==='gestanta'||stare==='maternitate')?'block':'none';
 }
