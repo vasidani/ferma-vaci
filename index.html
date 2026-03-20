@@ -967,7 +967,8 @@ async function loadVaci() {
       <td>${badgeStare(v.stare||'lactatie')}</td>
       <td>${gestHtml}</td>
       <td><div class="action-btns">
-        <button class="btn btn-secondary btn-sm" onclick='openFisa(${JSON.stringify(v)})'>📋 Fișă</button>
+        button class="btn btn-secondary btn-sm" onclick='openFisa(${JSON.stringify(v)})'>📋 Fișă</button>
+<button class="btn btn-amber btn-sm" onclick='openEditeaza(${JSON.stringify(v)})'>✏️ Editează</button>
         ${m&&daysDiff(m.data_monta)<240?`<button class="btn btn-secondary btn-sm" onclick="openModifGest('${m.id}')">✏️</button>`:''}
       </div></td>
     </tr>`;
