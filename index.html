@@ -605,7 +605,32 @@ tr:hover td{background:rgba(74,140,63,0.03);}
   </div>
 </div>
 
-<!-- MODAL MODIFICA GESTATIE -->
+<!-- MODAL ADAUGA VITEL -->
+<div class="modal-overlay" id="modalAdaugaVitel">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><div class="modal-title">🐂 Adaugă vițel</div><button class="modal-close" onclick="closeModal('modalAdaugaVitel')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data nașterii *</label><input type="date" id="vit_data" class="form-control"></div>
+        <div class="form-group"><label class="form-label">Sex *</label><select id="vit_sex" class="form-control"><option value="femela">Femelă</option><option value="mascul">Mascul</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Mama (vaca)</label><select id="vit_mama" class="form-control"><option value="">Fără mamă înregistrată</option></select></div>
+        <div class="form-group"><label class="form-label">Tată / taur</label><input type="text" id="vit_tata" class="form-control" placeholder="ex: Holstein #A123"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Greutate la naștere (kg)</label><input type="number" id="vit_greutate" class="form-control" placeholder="ex: 38"></div>
+        <div class="form-group"><label class="form-label">Sănătate</label><select id="vit_sanatate" class="form-control"><option value="true">Sănătos</option><option value="false">Probleme</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Observații</label><textarea id="vit_obs" class="form-control" placeholder="Observații opționale..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalAdaugaVitel')">Anulează</button>
+      <button class="btn btn-primary" onclick="salveazaVitel()">💾 Salvează</button>
+    </div>
+  </div>
+</div>
+  <!-- MODAL MODIFICA GESTATIE -->
 <div class="modal-overlay" id="modalModifGest">
   <div class="modal" style="max-width:460px">
     <div class="modal-header"><div class="modal-title">✏️ Modificare gestație</div><button class="modal-close" onclick="closeModal('modalModifGest')">✕</button></div>
