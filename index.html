@@ -885,10 +885,18 @@ async function salveazaVaca() {
 }
 
 async function loadVitei() {
-  const { data: fatari } = await db.from('fatari').select('*,vaci_lapte(nume,numar_crotal)').order('data_fatare',{ascending:false});
+  const { data: fatari, error } = await db.from('fatari').select('*').order('data_fatare',{ascending:false});
   const tbody = document.getElementById('tblVitei');
+  if(error){ tbody.innerHTML=`<tr><td colspan="7" class="loading">Eroare: ${error.message}</td></tr>`; return; }
   if(!fatari||fatari.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există viței înregistrați</td></tr>'; return; }
+  const vacaIds = [...new Set(fatari.map(f=>f.vaca_id).filter(Boolean))];
+  let vaciMap = {};
+  if(vacaIds.length>0){
+    const { data: vaciData } = await db.from('vaci_lapte').select('id,nume,numar_crotal').in('id', vacaIds);
+    if(vaciData) vaciData.forEach(v=>vaciMap[v.id]=v);
+  }
   tbody.innerHTML = fatari.map(f=>{
+    const vaca = vaciMap[f.vaca_id]||{};
     const zileVarsta = daysDiff(f.data_fatare);
     const luni = Math.floor(zileVarsta/30);
     let stareVitel='';
@@ -900,7 +908,7 @@ async function loadVitei() {
     return `<tr>
       <td>${formatDate(f.data_fatare)}</td>
       <td><span class="badge ${f.sex_vitel==='mascul'?'b-mascul':'b-femela'}">${f.sex_vitel==='mascul'?'🐂 Mascul':'🐄 Femelă'}</span></td>
-      <td>${f.vaci_lapte?.numar_crotal||''} ${f.vaci_lapte?.nume||'–'}</td>
+      <td>${vaca.numar_crotal||''} ${vaca.nume||'–'}</td>
       <td style="font-size:0.78rem;color:var(--text-mid)">${f.informatii_tata||'–'}</td>
       <td>${luni} luni ${zileVarsta%30} zile</td>
       <td>${stareVitel}</td>
@@ -969,12 +977,21 @@ async function salveazaMonta() {
 }
 
 async function loadMonte() {
-  const { data } = await db.from('monte').select('*,vaci_lapte(nume,numar_crotal)').eq('gestanta_confirmata',false).eq('fatare_finalizata',false).order('data_monta',{ascending:false});
+  const { data, error } = await db.from('monte').select('*').eq('gestanta_confirmata',false).eq('fatare_finalizata',false).order('data_monta',{ascending:false});
   const tbody = document.getElementById('tblMonte');
+  if(error){ tbody.innerHTML=`<tr><td colspan="8" class="loading">Eroare: ${error.message}</td></tr>`; return; }
   if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="8" class="loading">Nu există monte active</td></tr>'; return; }
+  // Fetch vaci names separately
+  const vacaIds = [...new Set(data.map(m=>m.vaca_id).filter(Boolean))];
+  let vaciMap = {};
+  if(vacaIds.length>0){
+    const { data: vaciData } = await db.from('vaci_lapte').select('id,nume,numar_crotal').in('id', vacaIds);
+    if(vaciData) vaciData.forEach(v=>vaciMap[v.id]=v);
+  }
   tbody.innerHTML = data.map(m=>{
+    const v = vaciMap[m.vaca_id]||{};
     const z=daysDiff(m.data_monta);
-    const numeV=`${m.vaci_lapte?.numar_crotal||''} – ${m.vaci_lapte?.nume||'–'}`;
+    const numeV=`${v.numar_crotal||''} – ${v.nume||'–'}`;
     let stare=z>=30?`<span class="badge b-maternitate">🚨 Confirmare</span>`:z>=21?`<span class="badge b-tratament">⚠️ Călduri</span>`:`<span class="badge b-lactatie">Așteptare</span>`;
     return `<tr>
       <td><strong>${numeV}</strong></td>
@@ -984,18 +1001,26 @@ async function loadMonte() {
       <td style="font-size:0.78rem">${z>=21?'<span style="color:var(--amber)">⚠️ Verificați</span>':formatDate(addDays(m.data_monta,21))}</td>
       <td style="font-size:0.78rem">${z>=30?'<span style="color:var(--red);font-weight:700">🚨 ACUM</span>':formatDate(addDays(m.data_monta,30))}</td>
       <td>${stare}</td>
-      <td><button class="btn btn-primary btn-sm" onclick="deschideCalduri('${m.id}','${m.vaci_lapte?.nume||''}')">Confirmă</button></td>
+      <td><button class="btn btn-primary btn-sm" onclick="deschideCalduri('${m.id}','${v.nume||''}')">Confirmă</button></td>
     </tr>`;
   }).join('');
 }
 
 async function loadGestante() {
-  const { data } = await db.from('monte').select('*,vaci_lapte(nume,numar_crotal)').eq('gestanta_confirmata',true).eq('fatare_finalizata',false).order('data_monta');
+  const { data, error } = await db.from('monte').select('*').eq('gestanta_confirmata',true).eq('fatare_finalizata',false).order('data_monta');
   const tbody = document.getElementById('tblGestante');
+  if(error){ tbody.innerHTML=`<tr><td colspan="7" class="loading">Eroare: ${error.message}</td></tr>`; return; }
   if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există vaci gestante</td></tr>'; return; }
+  const vacaIds = [...new Set(data.map(m=>m.vaca_id).filter(Boolean))];
+  let vaciMap = {};
+  if(vacaIds.length>0){
+    const { data: vaciData } = await db.from('vaci_lapte').select('id,nume,numar_crotal').in('id', vacaIds);
+    if(vaciData) vaciData.forEach(v=>vaciMap[v.id]=v);
+  }
   tbody.innerHTML = data.map(m=>{
+    const v = vaciMap[m.vaca_id]||{};
     const z=daysDiff(m.data_monta);
-    const numeV=`${m.vaci_lapte?.numar_crotal||''} – ${m.vaci_lapte?.nume||'–'}`;
+    const numeV=`${v.numar_crotal||''} – ${v.nume||'–'}`;
     return `<tr>
       <td><strong>${numeV}</strong></td>
       <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">${formatDate(m.data_monta)}</td>
@@ -1009,17 +1034,27 @@ async function loadGestante() {
 }
 
 async function loadIstoricMonte() {
-  const { data } = await db.from('monte').select('*,vaci_lapte(nume,numar_crotal)').eq('fatare_finalizata',true).order('data_monta',{ascending:false}).limit(30);
+  const { data, error } = await db.from('monte').select('*').eq('fatare_finalizata',true).order('data_monta',{ascending:false}).limit(30);
   const tbody = document.getElementById('tblIstoricMonte');
+  if(error){ tbody.innerHTML=`<tr><td colspan="6" class="loading">Eroare: ${error.message}</td></tr>`; return; }
   if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="6" class="loading">Nu există istoric</td></tr>'; return; }
-  tbody.innerHTML = data.map(m=>`<tr>
-    <td>${m.vaci_lapte?.numar_crotal||''} – ${m.vaci_lapte?.nume||'–'}</td>
-    <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">${formatDate(m.data_monta)}</td>
-    <td>${m.tip_monta||'–'}</td>
-    <td style="font-size:0.78rem">${m.informatii_taur||'–'}</td>
-    <td><span class="badge b-lactatie">Finalizată</span></td>
-    <td style="font-size:0.78rem">${formatDate(m.data_fatare_reala)}</td>
-  </tr>`).join('');
+  const vacaIds = [...new Set(data.map(m=>m.vaca_id).filter(Boolean))];
+  let vaciMap = {};
+  if(vacaIds.length>0){
+    const { data: vaciData } = await db.from('vaci_lapte').select('id,nume,numar_crotal').in('id', vacaIds);
+    if(vaciData) vaciData.forEach(v=>vaciMap[v.id]=v);
+  }
+  tbody.innerHTML = data.map(m=>{
+    const v = vaciMap[m.vaca_id]||{};
+    return `<tr>
+      <td>${v.numar_crotal||''} – ${v.nume||'–'}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">${formatDate(m.data_monta)}</td>
+      <td>${m.tip_monta||'–'}</td>
+      <td style="font-size:0.78rem">${m.informatii_taur||'–'}</td>
+      <td><span class="badge b-lactatie">Finalizată</span></td>
+      <td style="font-size:0.78rem">${formatDate(m.data_fatare_reala)}</td>
+    </tr>`;
+  }).join('');
 }
 
 function deschideCalduri(montaId, numeVaca) {
@@ -1088,12 +1123,19 @@ async function salveazaTratament() {
 }
 
 async function loadSanatate() {
-  const { data } = await db.from('sanatate').select('*,vaci_lapte(nume,numar_crotal)').order('data',{ascending:false});
+  const { data, error } = await db.from('sanatate').select('*').order('data',{ascending:false});
+  if(error){ notif('Eroare sanatate: '+error.message,'err'); return; }
+  const vacaIds=[...new Set(data.map(x=>x.vaca_id).filter(Boolean))];
+  let vaciMap={};
+  if(vacaIds.length>0){
+    const { data: vd } = await db.from('vaci_lapte').select('id,nume,numar_crotal').in('id',vacaIds);
+    if(vd) vd.forEach(v=>vaciMap[v.id]=v);
+  }
   if(!data) return;
   const active=data.filter(x=>x.tip==='tratament'&&!x.finalizat);
   const vacc=data.filter(x=>x.tip==='vaccin');
   const dep=data.filter(x=>x.tip==='deparazitare');
-  const vName=x=>`${x.vaci_lapte?.numar_crotal||''} – ${x.vaci_lapte?.nume||'–'}`;
+  const vName=x=>{const v=vaciMap[x.vaca_id]||{};return`${v.numar_crotal||''} – ${v.nume||'–'}`;};
   document.getElementById('tblTrat').innerHTML=active.length?active.map(x=>{
     const z=x.durata_zile?Math.min(daysDiff(x.data),x.durata_zile):'–';
     return `<tr><td><strong>${vName(x)}</strong></td><td>${x.diagnostic||'–'}</td><td>${x.medicament||'–'}</td><td>${x.doza||'–'}</td><td>${formatDate(x.data)}</td><td>${z}/${x.durata_zile||'?'}</td><td>${x.carantina_lapte_zile>0?`<span style="color:var(--red);font-weight:700">⛔ ${x.carantina_lapte_zile}z</span>`:'–'}</td><td>${x.veterinar||'–'}</td><td><button class="btn btn-secondary btn-sm" onclick="finalizeazaTratament('${x.id}')">✅</button></td></tr>`;
