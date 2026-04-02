@@ -630,8 +630,8 @@ tr:hover td{background:rgba(74,140,63,0.03);}
     <div class="modal-body" id="fisaBody"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalFisa')">Închide</button>
-      <button class="btn btn-danger btn-sm" onclick="vindeVacaActiva()">🏷️ Marchează vândută</button>
-      <button class="btn btn-primary" onclick="closeModal('modalFisa');openModalTratament()">+ Intervenție medicală</button>
+      <button class="btn btn-danger" onclick="vindeVacaActiva()">🏷️ Vândută / Reformă</button>
+      <button class="btn btn-primary" onclick="closeModal('modalFisa');openModalTratament()">+ Intervenție</button>
     </div>
   </div>
 </div>
@@ -800,6 +800,24 @@ function badgeStare(stare) {
   return `<span class="badge ${map[stare]||'b-lactatie'}">${labels[stare]||stare}</span>`;
 }
 
+// Load vaca by ID for fisa
+async function openFisaById(id) {
+  const { data: v } = await db.from('vaci_lapte').select('*').eq('id', id).single();
+  if(v) openFisa(v);
+}
+
+async function openEditeazaById(id) {
+  const { data: v } = await db.from('vaci_lapte').select('*').eq('id', id).single();
+  if(v) openEditeaza(v);
+}
+
+async function vindeVacaById(id) {
+  if(!confirm('Sigur marcați această vacă ca vândută? Va fi scoasă din efectivul activ.')) return;
+  await db.from('vaci_lapte').update({activ:false, stare:'vanduta', data_vanzare:today()}).eq('id', id);
+  notif('Vaca a fost marcată ca vândută și scoasă din efectiv.','ok');
+  loadVaci(); loadDashboard();
+}
+
 function progGest(zile) {
   const pct=Math.min(Math.round((zile/283)*100),100);
   const cls=pct>=95?'danger':pct>=88?'warn':'';
@@ -936,12 +954,13 @@ async function loadVaci() {
       <td>${v.nume}${etichetaExtra} ${warn7}</td>
       <td>${ageLabel}</td>
       <td style="text-align:center"><strong>${v.nr_fatari||0}</strong></td>
-      <td>${badgeStare(v.stare||'lactatie')}</td>
+      <td>${m&&!m.gestanta_confirmata?badgeStare('montata'):badgeStare(v.stare||'lactatie')}</td>
       <td>${gestHtml}</td>
       <td><div class="action-btns">
-        <button class="btn btn-secondary btn-sm" onclick='openFisa(${JSON.stringify(v)})'>📋 Fișă</button>
-        <button class="btn btn-amber btn-sm" onclick='openEditeaza(${JSON.stringify(v)})'>✏️</button>
-        ${m&&m.gestanta_confirmata?`<button class="btn btn-danger btn-sm" onclick="openAvort('${m.id}','${v.id}')">⚠️</button>`:''}
+        <button class="btn btn-secondary btn-sm" onclick="openFisaById('${v.id}')">📋 Fișă</button>
+        <button class="btn btn-amber btn-sm" onclick="openEditeazaById('${v.id}')">✏️</button>
+        ${m&&m.gestanta_confirmata?`<button class="btn btn-danger btn-sm" onclick="openAvort('${m.id}','${v.id}')">⚠️ Avort</button>`:''}
+        ${!m?`<button class="btn btn-danger btn-sm" onclick="vindeVacaById('${v.id}')">🏷️ Vinde</button>`:''}
       </div></td>
     </tr>`;
   }).join('');
@@ -1032,9 +1051,14 @@ async function loadVitei() {
     let stareVitel='';
     let actiune='';
     if(f.vitel_vandut){ stareVitel='<span class="badge b-vanduta">Vândut</span>'; }
-    else if(zileVarsta>=75&&!f.vandut_confirmat){ stareVitel='<span class="badge b-gestanta">⚠️ Confirmare</span>'; actiune=`<button class="btn btn-amber btn-sm" onclick="openVitelVandut('${f.id}')">Confirmă</button>`; }
-    else if(zileVarsta>=540&&f.sex_vitel==='femela'&&!f.vitel_vandut){ stareVitel='<span class="badge b-montata">🔔 Aptă montă</span>'; }
+    else if(zileVarsta>=540&&f.sex_vitel==='femela'){ stareVitel='<span class="badge b-montata">🔔 Aptă montă</span>'; }
+    else if(zileVarsta>=75&&!f.vandut_confirmat){ stareVitel='<span class="badge b-gestanta">⚠️ Confirmare 2.5 luni</span>'; }
     else { stareVitel=`<span class="badge b-lactatie">${luni}l ${zileVarsta%30}z</span>`; }
+    // Always show edit and sell buttons
+    actiune=`<div class="action-btns">
+      <button class="btn btn-amber btn-sm" onclick="openEditeazaVitel(${f.id})">✏️</button>
+      ${!f.vitel_vandut?`<button class="btn btn-danger btn-sm" onclick="vindeVitel(${f.id})">🏷️ Vinde</button>`:''}
+    </div>`;
     return `<tr>
       <td>${formatDate(f.data_fatare)}</td>
       <td><span class="badge ${f.sex_vitel==='mascul'?'b-mascul':'b-femela'}">${f.sex_vitel==='mascul'?'🐂 Mascul':'🐄 Femelă'}</span></td>
@@ -1043,7 +1067,7 @@ async function loadVitei() {
       <td style="font-size:0.78rem;color:var(--text-mid)">${f.informatii_tata||'–'}</td>
       <td>${luni} luni ${zileVarsta%30} zile</td>
       <td>${stareVitel}</td>
-      <td><div class="action-btns">${actiune}<button class="btn btn-amber btn-sm" onclick="openEditeazaVitel(${f.id})">✏️</button></div></td>
+      <td>${actiune}</td>
     </tr>`;
   }).join('');
 }
@@ -1466,12 +1490,19 @@ async function openFisa(v) {
   openModal('modalFisa');
 }
 
+async function vindeVitel(id) {
+  currentVitelId = id;
+  document.getElementById('vv_data').value = today();
+  document.getElementById('vv_stare').value = 'vandut';
+  openModal('modalVitelVandut');
+}
+
 async function vindeVacaActiva() {
   if(!currentVacaId) return;
-  if(!confirm('Sigur marcați această vacă ca vândută?')) return;
+  if(!confirm('Sigur marcați această vacă ca vândută / reformată? Va fi scoasă din efectivul activ.')) return;
   await db.from('vaci_lapte').update({activ:false,stare:'vanduta',data_vanzare:today()}).eq('id',currentVacaId);
   closeModal('modalFisa');
-  notif('Vaca marcată ca vândută și scoasă din efectiv.','ok');
+  notif('Vaca marcată ca vândută și scoasă din efectiv. ✅','ok');
   loadVaci(); loadDashboard();
 }
 
