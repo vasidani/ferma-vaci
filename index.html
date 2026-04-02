@@ -934,7 +934,7 @@ async function loadVaci() {
   const tbody = document.getElementById('tblVaci');
   if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="loading">Nu există vaci înregistrate</td></tr>'; return; }
   const filtered = data.filter(v=>!search||v.nume?.toLowerCase().includes(search)||v.numar_crotal?.toLowerCase().includes(search));
-  const { data: monte } = await db.from('monte').select('*').eq('gestanta_confirmata',true).eq('fatare_finalizata',false);
+  const { data: monte } = await db.from('monte').select('*').eq('fatare_finalizata',false);
   tbody.innerHTML = filtered.map(v=>{
     const age = getAge(v.an_nastere||2020, v.data_nastere);
     const ageLabel = getAgeLabel(v.an_nastere||2020, v.data_nastere);
@@ -942,8 +942,11 @@ async function loadVaci() {
     let gestHtml = '–';
     if(m){
       const z=daysDiff(m.data_monta);
-      if(m.gestanta_confirmata){ gestHtml=progGest(z); }
-      else { gestHtml=`<span style="font-size:0.78rem;color:var(--blue)">Montată acum ${z} zile</span>`; }
+      if(m.gestanta_confirmata){
+        gestHtml=progGest(z);
+      } else {
+        gestHtml=`<span style="font-size:0.78rem;color:var(--blue);font-weight:600">Montată acum <strong>${z}</strong> zile</span>`;
+      }
     }
     const warn7 = age>=7?'<span title="7+ ani" style="color:var(--amber)">⚠️</span>':'';
     let etichetaExtra = '';
@@ -959,8 +962,9 @@ async function loadVaci() {
       <td><div class="action-btns">
         <button class="btn btn-secondary btn-sm" onclick="openFisaById('${v.id}')">📋 Fișă</button>
         <button class="btn btn-amber btn-sm" onclick="openEditeazaById('${v.id}')">✏️</button>
-        ${m&&m.gestanta_confirmata?`<button class="btn btn-danger btn-sm" onclick="openAvort('${m.id}','${v.id}')">⚠️ Avort</button>`:''}
-        ${!m?`<button class="btn btn-danger btn-sm" onclick="vindeVacaById('${v.id}')">🏷️ Vinde</button>`:''}
+        ${m&&m.gestanta_confirmata&&daysDiff(m.data_monta)<240?`<button class="btn btn-danger btn-sm" onclick="openAvort('${m.id}','${v.id}')">⚠️ Avort</button>`:''}
+        ${m&&m.gestanta_confirmata&&daysDiff(m.data_monta)>=280?`<button class="btn btn-primary btn-sm" onclick="openFatare('${m.id}','${v.id}')">🍼 Fătare</button>`:''}
+        <button class="btn btn-danger btn-sm" onclick="vindeVacaById('${v.id}')">🏷️ Vinde</button>
       </div></td>
     </tr>`;
   }).join('');
