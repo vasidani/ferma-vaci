@@ -429,7 +429,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Rasă</label><select id="v_rasa" class="form-control"><option>Holstein</option><option>Bălțata Românească</option><option>Simmental</option><option>Brown Swiss</option><option>Alta</option></select></div>
-        <div class="form-group"><label class="form-label">An naștere *</label><input type="number" id="v_an" class="form-control" placeholder="2019" min="2000" max="2035"></div>
+        <div class="form-group"><label class="form-label">Data nașterii *</label><input type="date" id="v_data_nastere" class="form-control"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Nr. fătări actuale</label><input type="number" id="v_fatari" class="form-control" value="0" min="0"></div>
@@ -481,6 +481,46 @@ tr:hover td{background:rgba(74,140,63,0.03);}
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalAdaugaVitel')">Anulează</button>
       <button class="btn btn-primary" id="btnSalveazaVitel" onclick="salveazaVitel()">💾 Salvează</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL CONFIRMARE FATARE -->
+<div class="modal-overlay" id="modalFatare">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><div class="modal-title">🍼 Confirmare fătare</div><button class="modal-close" onclick="closeModal('modalFatare')">✕</button></div>
+    <div class="modal-body">
+      <div class="info-box" style="margin-bottom:14px">📅 Au trecut 280+ zile de gestație. Confirmați că vaca a fătat!</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data fătării *</label><input type="date" id="fat_data" class="form-control"></div>
+        <div class="form-group"><label class="form-label">Tip fătare</label><select id="fat_tip" class="form-control"><option value="normala">Normală</option><option value="dificila">Dificilă</option><option value="cezariana">Cezariană</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Vițelul este viu?</label>
+        <select id="fat_viu" class="form-control" onchange="toggleVitelViu()">
+          <option value="viu">Da – viu și sănătos</option>
+          <option value="mort">Nu – mort</option>
+        </select>
+      </div>
+      <div id="fat_vitel_section">
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:10px">
+          <div style="font-size:0.82rem;font-weight:700;color:var(--text-mid);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;font-family:'IBM Plex Mono',monospace">Date vițel</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Sex vițel</label><select id="fat_sex" class="form-control"><option value="femela">Femelă</option><option value="mascul">Mascul</option></select></div>
+            <div class="form-group"><label class="form-label">Nume vițel</label><input type="text" id="fat_nume_vitel" class="form-control" placeholder="ex: Steluța"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nr. crotal vițel</label><input type="text" id="fat_crotal_vitel" class="form-control" placeholder="ex: RO1234567"></div>
+            <div class="form-group"><label class="form-label">Greutate (kg)</label><input type="number" id="fat_greutate" class="form-control" placeholder="ex: 38"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Tată / taur</label><input type="text" id="fat_tata" class="form-control" placeholder="ex: Holstein #A123"></div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Observații</label><textarea id="fat_obs" class="form-control" placeholder="Observații..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalFatare')">Anulează</button>
+      <button class="btn btn-primary" onclick="salveazaFatare()">✅ Confirmă fătarea</button>
     </div>
   </div>
 </div>
@@ -736,7 +776,23 @@ function today() { return new Date().toISOString().split('T')[0]; }
 function addDays(dateStr,n) { const d=new Date(dateStr); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
 function daysDiff(dateStr) { return Math.floor((new Date()-new Date(dateStr))/(1000*60*60*24)); }
 function formatDate(d) { if(!d) return '–'; const dt=new Date(d); return `${dt.getDate().toString().padStart(2,'0')}.${(dt.getMonth()+1).toString().padStart(2,'0')}.${dt.getFullYear()}`; }
-function getAge(an) { return new Date().getFullYear()-an; }
+function getAge(an, dataNastere) {
+  if(dataNastere) {
+    const diff = new Date() - new Date(dataNastere);
+    return Math.floor(diff/(1000*60*60*24*365.25));
+  }
+  return new Date().getFullYear()-(an||2020);
+}
+function getAgeLabel(an, dataNastere) {
+  if(dataNastere) {
+    const zile = Math.floor((new Date()-new Date(dataNastere))/(1000*60*60*24));
+    if(zile < 365) return `${Math.floor(zile/30)} luni ${zile%30} zile`;
+    const ani = Math.floor(zile/365);
+    const luni = Math.floor((zile%365)/30);
+    return luni>0?`${ani} ani ${luni} luni`:`${ani} ani`;
+  }
+  return `${new Date().getFullYear()-(an||2020)} ani`;
+}
 
 function badgeStare(stare) {
   const map={lactatie:'b-lactatie',gestanta:'b-gestanta',uscata:'b-uscata',maternitate:'b-maternitate',tratament:'b-tratament',montata:'b-montata',vanduta:'b-vanduta'};
@@ -804,7 +860,7 @@ async function calcAlerte() {
       if(m.gestanta_confirmata&&zile>=263&&zile<280&&!m.transferata_maternitate)
         alerte.push({nivel:'red',vaca:`${crotal} – ${numeVaca}`,mesaj:`263 zile – Transfer la maternitate!`,sub:`Fătare estimată: ${formatDate(addDays(m.data_monta,283))}`});
       if(m.gestanta_confirmata&&zile>=280&&!m.fatare_finalizata)
-        alerte.push({nivel:'red',vaca:`${crotal} – ${numeVaca}`,mesaj:`280 zile – FĂTARE IMINENTĂ!`,sub:`Fătare estimată: ${formatDate(addDays(m.data_monta,283))}`});
+        alerte.push({nivel:'red',vaca:`${crotal} – ${numeVaca}`,mesaj:`280 zile – Confirmați fătarea!`,sub:`Fătare estimată: ${formatDate(addDays(m.data_monta,283))}`,actiune:`openFatare('${m.id}','${m.vaca_id}')`});
     }
   }
   const { data: vaci7 } = await db.from('vaci_lapte').select('*').eq('activ',true);
@@ -862,26 +918,30 @@ async function loadVaci() {
   const filtered = data.filter(v=>!search||v.nume?.toLowerCase().includes(search)||v.numar_crotal?.toLowerCase().includes(search));
   const { data: monte } = await db.from('monte').select('*').eq('gestanta_confirmata',true).eq('fatare_finalizata',false);
   tbody.innerHTML = filtered.map(v=>{
-    const age = getAge(v.an_nastere||2020);
+    const age = getAge(v.an_nastere||2020, v.data_nastere);
+    const ageLabel = getAgeLabel(v.an_nastere||2020, v.data_nastere);
     const m = monte?.find(x=>x.vaca_id===v.id);
     let gestHtml = '–';
-    if(m){ const z=daysDiff(m.data_monta); gestHtml=progGest(z); }
+    if(m){
+      const z=daysDiff(m.data_monta);
+      if(m.gestanta_confirmata){ gestHtml=progGest(z); }
+      else { gestHtml=`<span style="font-size:0.78rem;color:var(--blue)">Montată acum ${z} zile</span>`; }
+    }
     const warn7 = age>=7?'<span title="7+ ani" style="color:var(--amber)">⚠️</span>':'';
-    // Eticheta juninca/primipara
     let etichetaExtra = '';
     if(v.nr_fatari===0 && age>=1) etichetaExtra = ' <span style="font-size:0.7rem;color:var(--blue);font-weight:700">(Junincă)</span>';
     else if(v.nr_fatari===1) etichetaExtra = ' <span style="font-size:0.7rem;color:var(--text-mid);font-weight:700">(Primipară)</span>';
     return `<tr>
       <td><strong style="font-family:'IBM Plex Mono',monospace">${v.numar_crotal||'–'}</strong></td>
       <td>${v.nume}${etichetaExtra} ${warn7}</td>
-      <td>${age} ani</td>
+      <td>${ageLabel}</td>
       <td style="text-align:center"><strong>${v.nr_fatari||0}</strong></td>
       <td>${badgeStare(v.stare||'lactatie')}</td>
       <td>${gestHtml}</td>
       <td><div class="action-btns">
         <button class="btn btn-secondary btn-sm" onclick='openFisa(${JSON.stringify(v)})'>📋 Fișă</button>
         <button class="btn btn-amber btn-sm" onclick='openEditeaza(${JSON.stringify(v)})'>✏️</button>
-        ${m?`<button class="btn btn-danger btn-sm" onclick="openAvort('${m.id}','${v.id}')">⚠️</button>`:''}
+        ${m&&m.gestanta_confirmata?`<button class="btn btn-danger btn-sm" onclick="openAvort('${m.id}','${v.id}')">⚠️</button>`:''}
       </div></td>
     </tr>`;
   }).join('');
@@ -900,7 +960,7 @@ function openEditeaza(v) {
   document.getElementById('v_crotal').value = v.numar_crotal||'';
   document.getElementById('v_nume').value = v.nume||'';
   document.getElementById('v_rasa').value = v.rasa||'Holstein';
-  document.getElementById('v_an').value = v.an_nastere||'';
+  document.getElementById('v_data_nastere').value = v.data_nastere||'';
   document.getElementById('v_fatari').value = v.nr_fatari||0;
   document.getElementById('v_stare').value = v.stare||'lactatie';
   document.getElementById('v_obs').value = v.observatii||'';
@@ -911,9 +971,10 @@ function openEditeaza(v) {
 async function salveazaVaca() {
   const crotal = document.getElementById('v_crotal').value.trim();
   const nume = document.getElementById('v_nume').value.trim();
-  const an = parseInt(document.getElementById('v_an').value)||null;
-  if(!crotal||!nume||!an){ notif('Completați crotalul, numele și anul nașterii!','err'); return; }
-  const obj = { numar_crotal:crotal, nume, rasa:document.getElementById('v_rasa').value, an_nastere:an, nr_fatari:parseInt(document.getElementById('v_fatari').value)||0, stare:document.getElementById('v_stare').value, observatii:document.getElementById('v_obs').value };
+  if(!crotal||!nume){ notif('Completați crotalul și numele!','err'); return; }
+  const dataNastere = document.getElementById('v_data_nastere').value;
+  const an = dataNastere ? new Date(dataNastere).getFullYear() : null;
+  const obj = { numar_crotal:crotal, nume, rasa:document.getElementById('v_rasa').value, an_nastere:an, data_nastere:dataNastere||null, nr_fatari:parseInt(document.getElementById('v_fatari').value)||0, stare:document.getElementById('v_stare').value, observatii:document.getElementById('v_obs').value };
   let error;
   if(editMode && currentVacaId) {
     const res = await db.from('vaci_lapte').update(obj).eq('id',currentVacaId);
@@ -932,6 +993,28 @@ async function salveazaVaca() {
 }
 
 async function loadVitei() {
+  // Auto-transfer vitei >18 luni to vaci
+  const { data: toTransfer } = await db.from('fatari').select('*').eq('vitel_vandut',false).eq('sex_vitel','femela').eq('vitel_ramas_ferma',true);
+  if(toTransfer) {
+    for(const f of toTransfer) {
+      const zile = daysDiff(f.data_fatare);
+      if(zile >= 548 && !f.transferata_vaca) { // 18 luni = ~548 zile
+        // Check if already transferred
+        const { data: existing } = await db.from('vaci_lapte').select('id').eq('numar_crotal', f.crotal_vitel||'TRANSFER_'+f.id).limit(1);
+        if(!existing||existing.length===0) {
+          await db.from('vaci_lapte').insert({
+            nume: f.nume_vitel||'Junincă',
+            numar_crotal: f.crotal_vitel||null,
+            data_nastere: f.data_fatare,
+            an_nastere: new Date(f.data_fatare).getFullYear(),
+            nr_fatari: 0, stare: 'uscata', activ: true, categorie: 'vaca',
+            observatii: 'Transferată automat din viței la 18 luni'
+          });
+          await db.from('fatari').update({transferata_vaca:true, vitel_vandut:true}).eq('id',f.id);
+        }
+      }
+    }
+  }
   const { data: fatari, error } = await db.from('fatari').select('*').eq('vitel_vandut',false).order('data_fatare',{ascending:false});
   const tbody = document.getElementById('tblVitei');
   if(error){ tbody.innerHTML=`<tr><td colspan="7" class="loading">Eroare: ${error.message}</td></tr>`; return; }
@@ -1113,7 +1196,10 @@ async function loadGestante() {
       <td>${progGest(z)}</td>
       <td style="font-size:0.78rem">${z>=263?'<span style="color:var(--red);font-weight:700">🚨 Transferați!</span>':formatDate(addDays(m.data_monta,263))}</td>
       <td style="font-size:0.78rem">${z>=280?'<span style="color:var(--red);font-weight:700">🔴 Iminentă!</span>':formatDate(addDays(m.data_monta,280))}</td>
-      <td>${z<240?`<button class="btn btn-secondary btn-sm" onclick="openModifGest('${m.id}')">✏️</button>`:''}</td>
+      <td><div class="action-btns">
+        ${z<240?`<button class="btn btn-secondary btn-sm" onclick="openModifGest('${m.id}')">✏️ Gestație</button>`:''}
+        ${z>=280?`<button class="btn btn-primary btn-sm" onclick="openFatare('${m.id}','${m.vaca_id}')">🍼 Confirmă fătare</button>`:''}
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -1241,6 +1327,67 @@ async function finalizeazaTratament(id) {
 }
 
 
+
+let fatareMontaId = null;
+let fatareVacaId = null;
+
+function toggleVitelViu() {
+  const viu = document.getElementById('fat_viu').value;
+  document.getElementById('fat_vitel_section').style.display = viu==='viu'?'block':'none';
+}
+
+function openFatare(montaId, vacaId) {
+  fatareMontaId = montaId;
+  fatareVacaId = vacaId;
+  document.getElementById('fat_data').value = today();
+  document.getElementById('fat_vitel_section').style.display = 'block';
+  openModal('modalFatare');
+}
+
+async function salveazaFatare() {
+  const dataFatare = document.getElementById('fat_data').value;
+  if(!dataFatare){ notif('Completați data fătării!','err'); return; }
+  const viu = document.getElementById('fat_viu').value === 'viu';
+  
+  // Update monta
+  await db.from('monte').update({
+    fatare_finalizata: true,
+    data_fatare_reala: dataFatare
+  }).eq('id', fatareMontaId);
+  
+  // Update vaca - increment fatari, reset stare
+  const { data: vaca } = await db.from('vaci_lapte').select('nr_fatari').eq('id', fatareVacaId).single();
+  await db.from('vaci_lapte').update({
+    stare: 'lactatie',
+    nr_fatari: (vaca?.nr_fatari||0) + 1
+  }).eq('id', fatareVacaId);
+  
+  // Add fatare record
+  const fatareObj = {
+    vaca_id: fatareVacaId,
+    data_fatare: dataFatare,
+    tip_fatare: document.getElementById('fat_tip').value,
+    sex_vitel: document.getElementById('fat_sex').value,
+    vitel_sanatos: viu,
+    vitel_vandut: false,
+    vitel_ramas_ferma: viu
+  };
+  
+  if(viu) {
+    fatareObj.nume_vitel = document.getElementById('fat_nume_vitel').value||null;
+    fatareObj.crotal_vitel = document.getElementById('fat_crotal_vitel').value||null;
+    fatareObj.greutate_vitel = parseFloat(document.getElementById('fat_greutate').value)||null;
+    fatareObj.informatii_tata = document.getElementById('fat_tata').value||null;
+  }
+  fatareObj.observatii = document.getElementById('fat_obs').value||null;
+  
+  await db.from('fatari').insert(fatareObj);
+  
+  closeModal('modalFatare');
+  notif(viu?'Fătare confirmată! Vițelul a fost adăugat automat în secțiunea Viței 🐂':'Fătare confirmată. Vițel decedat notat în istoric.','ok');
+  loadVaci(); loadDashboard(); loadGestante();
+}
+
 let avortMontaId = null;
 let avortVacaId = null;
 
@@ -1302,8 +1449,8 @@ async function openFisa(v) {
       </div>
     </div></div>
     <div class="info-grid">
-      <div class="info-item"><div class="info-item-label">An naștere</div><div class="info-item-value">${v.an_nastere||'–'}</div></div>
-      <div class="info-item"><div class="info-item-label">Vârstă</div><div class="info-item-value">${age} ani</div></div>
+      <div class="info-item"><div class="info-item-label">Data nașterii</div><div class="info-item-value">${v.data_nastere?formatDate(v.data_nastere):(v.an_nastere||'–')}</div></div>
+      <div class="info-item"><div class="info-item-label">Vârstă</div><div class="info-item-value">${ageLabel}</div></div>
       <div class="info-item"><div class="info-item-label">Nr. fătări</div><div class="info-item-value">${v.nr_fatari||0}</div></div>
       <div class="info-item"><div class="info-item-label">Rasă</div><div class="info-item-value">${v.rasa||'–'}</div></div>
       <div class="info-item"><div class="info-item-label">Stare</div><div class="info-item-value">${v.stare||'–'}</div></div>
