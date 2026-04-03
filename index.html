@@ -802,13 +802,20 @@ function badgeStare(stare) {
 
 // Load vaca by ID for fisa
 async function openFisaById(id) {
-  const { data: v } = await db.from('vaci_lapte').select('*').eq('id', id).single();
-  if(v) openFisa(v);
+  try {
+    const { data: v, error } = await db.from('vaci_lapte').select('*').eq('id', id).single();
+    if(error){ notif('Eroare: '+error.message,'err'); return; }
+    if(v) openFisa(v);
+    else notif('Vaca nu a fost găsită!','err');
+  } catch(e){ notif('Eroare: '+e.message,'err'); }
 }
 
 async function openEditeazaById(id) {
-  const { data: v } = await db.from('vaci_lapte').select('*').eq('id', id).single();
-  if(v) openEditeaza(v);
+  try {
+    const { data: v, error } = await db.from('vaci_lapte').select('*').eq('id', id).single();
+    if(error){ notif('Eroare: '+error.message,'err'); return; }
+    if(v) openEditeaza(v);
+  } catch(e){ notif('Eroare: '+e.message,'err'); }
 }
 
 async function vindeVacaById(id) {
