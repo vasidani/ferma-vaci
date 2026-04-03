@@ -861,17 +861,26 @@ function badgeStare(stare) {
 let vaciCache = [];
 const vacaStore = {};
 
-function openFisaById(id) {
-  const v = vaciCache.find(x=>x.id===id);
-  if(v){ openFisa(v); return; }
-  // Fallback: search in DOM data
-  notif('Reîncărcați pagina Efectiv Vaci!','warn');
+async function openFisaById(id) {
+  // First try cache
+  let v = vacaStore[id] || vaciCache.find(x=>x.id===id);
+  if(!v) {
+    // Fetch from DB as fallback
+    const { data } = await db.from('vaci_lapte').select('*').eq('id', id).maybeSingle();
+    v = data;
+  }
+  if(v) openFisa(v);
+  else notif('Vaca nu a fost găsită!','err');
 }
 
-function openEditeazaById(id) {
-  const v = vaciCache.find(x=>x.id===id);
-  if(v){ openEditeaza(v); return; }
-  notif('Reîncărcați pagina Efectiv Vaci!','warn');
+async function openEditeazaById(id) {
+  let v = vacaStore[id] || vaciCache.find(x=>x.id===id);
+  if(!v) {
+    const { data } = await db.from('vaci_lapte').select('*').eq('id', id).maybeSingle();
+    v = data;
+  }
+  if(v) openEditeaza(v);
+  else notif('Vaca nu a fost găsită!','err');
 }
 
 async function vindeVacaById(id) {
@@ -1025,8 +1034,8 @@ async function loadVaci() {
       <td>${m&&!m.gestanta_confirmata?badgeStare('montata'):badgeStare(v.stare||'lactatie')}</td>
       <td>${gestHtml}</td>
       <td><div class="action-btns">
-        <button class="btn btn-secondary btn-sm" onclick="vacaStore['${v.id}']&&openFisa(vacaStore['${v.id}'])">📋 Fișă</button>
-        <button class="btn btn-amber btn-sm" onclick="vacaStore['${v.id}']&&openEditeaza(vacaStore['${v.id}'])">✏️</button>
+        <button class="btn btn-secondary btn-sm" onclick="openFisaById('${v.id}')">📋 Fișă</button>
+        <button class="btn btn-amber btn-sm" onclick="openEditeazaById('${v.id}')">✏️</button>
         ${m&&m.gestanta_confirmata&&daysDiff(m.data_monta)<240?`<button class="btn btn-danger btn-sm" onclick="openAvort('${m.id}','${v.id}')">⚠️ Avort</button>`:''}
         ${m&&m.gestanta_confirmata&&daysDiff(m.data_monta)>=280?`<button class="btn btn-primary btn-sm" onclick="openFatare('${m.id}','${v.id}')">🍼 Fătare</button>`:''}
         <button class="btn btn-danger btn-sm" onclick="vindeVacaById('${v.id}')">🏷️ Vinde</button>
