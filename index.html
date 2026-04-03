@@ -787,8 +787,14 @@ async function checkAndSendAlertNotifications() {
 async function initApp() {
   await loadVaciList();
   await loadDashboard();
+  await preloadVaciCache(); // Preload cache for fisa
   setTimeout(checkAndSendAlertNotifications, 3000);
-  setInterval(checkAndSendAlertNotifications, 3600000); // Check every hour
+  setInterval(checkAndSendAlertNotifications, 3600000);
+}
+
+async function preloadVaciCache() {
+  const { data } = await db.from('vaci_lapte').select('*').eq('activ',true).order('nume');
+  if(data) vaciCache = data;
 }
 
 async function loadVaciList() {
@@ -852,19 +858,19 @@ function badgeStare(stare) {
   return `<span class="badge ${map[stare]||'b-lactatie'}">${labels[stare]||stare}</span>`;
 }
 
-// Use cached vaci data - no extra fetch needed
 let vaciCache = [];
 
 function openFisaById(id) {
   const v = vaciCache.find(x=>x.id===id);
   if(v){ openFisa(v); return; }
-  notif('Date negăsite în cache, reîncărcați pagina!','err');
+  // Fallback: search in DOM data
+  notif('Reîncărcați pagina Efectiv Vaci!','warn');
 }
 
 function openEditeazaById(id) {
   const v = vaciCache.find(x=>x.id===id);
   if(v){ openEditeaza(v); return; }
-  notif('Date negăsite în cache, reîncărcați pagina!','err');
+  notif('Reîncărcați pagina Efectiv Vaci!','warn');
 }
 
 async function vindeVacaById(id) {
