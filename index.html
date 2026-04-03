@@ -1145,9 +1145,10 @@ async function openModalVitel() {
 let editSanId = null;
 
 async function openEditareSan(id) {
-  editSanId = id;
-  const { data: s, error } = await db.from('sanatate').select('*').eq('id', id).single();
-  if(error||!s){ notif('Eroare la încărcare!','err'); return; }
+  editSanId = parseInt(id);
+  const { data: s, error } = await db.from('sanatate').select('*').eq('id', parseInt(id)).single();
+  if(error){ notif('Eroare: '+error.message,'err'); return; }
+  if(!s){ notif('Înregistrarea nu a fost găsită!','err'); return; }
   document.getElementById('es_tip').value = s.tip||'tratament';
   document.getElementById('es_data').value = s.data||'';
   document.getElementById('es_diag').value = s.diagnostic||'';
@@ -1165,6 +1166,7 @@ async function salveazaEditareSan() {
   if(!editSanId){ notif('Eroare ID!','err'); return; }
   const durata = parseInt(document.getElementById('es_durata').value)||null;
   const data = document.getElementById('es_data').value;
+  editSanId = parseInt(editSanId);
   const { error } = await db.from('sanatate').update({
     tip: document.getElementById('es_tip').value,
     data, diagnostic: document.getElementById('es_diag').value,
