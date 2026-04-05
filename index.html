@@ -243,6 +243,10 @@ tr:hover td{background:rgba(74,140,63,0.03);}
       <div class="nav-item" onclick="showPage('reproductie',this)"><span>🔄</span> Reproducție</div>
       <div class="nav-item" onclick="showPage('sanatate',this)"><span>💊</span> Sănătate</div>
       <div class="nav-item" onclick="showPage('alerte',this)"><span>🔔</span> Alerte <span class="nav-badge" id="navAlertCount">0</span></div>
+      <div class="nav-section-label">Arhivă</div>
+      <div class="nav-item" onclick="showPage('istoric-vaci',this)"><span>🗂️</span> Istoric Vaci</div>
+      <div class="nav-section-label">Configurare</div>
+      <div class="nav-item" onclick="showPage('setari',this)"><span>⚙️</span> Setări Mulsuri</div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -348,6 +352,80 @@ tr:hover td{background:rgba(74,140,63,0.03);}
           <thead><tr><th>Data naștere</th><th>Sex</th><th>Nume / Crotal</th><th>Mama</th><th>Vârstă la ieșire</th><th>Data vânzare</th><th>Stare</th><th>Observații</th></tr></thead>
           <tbody id="tblIstoricVitei"><tr><td colspan="8" class="loading">Se încarcă...</td></tr></tbody>
         </table></div></div>
+      </div>
+
+      <!-- ISTORIC VACI -->
+      <div class="page" id="page-istoric-vaci">
+        <div class="section-header">
+          <div class="section-title">🗂️ Istoric Vaci (ieșite din fermă)</div>
+        </div>
+        <div class="card"><div class="table-wrap"><table>
+          <thead><tr><th>Crotal</th><th>Nume</th><th>Rasă</th><th>Data nașterii</th><th>Nr. Fătări</th><th>Data ieșirii</th><th>Motiv</th><th>Observații</th><th>Acțiuni</th></tr></thead>
+          <tbody id="tblIstoricVaci"><tr><td colspan="9" class="loading">Se încarcă...</td></tr></tbody>
+        </table></div></div>
+      </div>
+
+      <!-- SETARI MULSURI -->
+      <div class="page" id="page-setari">
+        <div class="section-header"><div class="section-title">⚙️ Setări Mulsuri & Notificări</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px">
+          <!-- Card muls 2x/zi -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">🥛 Program Mulsuri (2x/zi)</div></div>
+            <div class="card-body">
+              <div class="info-box" style="margin-bottom:14px">Setați ora primului muls. Cel de-al doilea se calculează automat la 12 ore distanță.</div>
+              <div class="form-group">
+                <label class="form-label">Ora muls dimineață</label>
+                <input type="time" id="set_ora_dim" class="form-control" value="06:00" oninput="calculeazaSeara()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ora muls seară (calculată automat)</label>
+                <input type="time" id="set_ora_seara" class="form-control" readonly style="background:var(--cream);cursor:not-allowed">
+              </div>
+              <button class="btn btn-primary btn-full" onclick="salveazaSetariMuls()">💾 Salvează program mulsuri</button>
+            </div>
+          </div>
+          <!-- Card muls 3x/zi (post-fătare) -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">🍼 Muls Amiază (vaci post-fătare)</div></div>
+            <div class="card-body">
+              <div class="info-box" style="margin-bottom:14px">Vacile fătate recent au nevoie de 3 mulsuri/zi. Setați ora mulsului de amiază.</div>
+              <div class="form-group">
+                <label class="form-label">Ora muls amiază</label>
+                <input type="time" id="set_ora_amiaza" class="form-control" value="12:00">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Muls amiază activ</label>
+                <select id="set_amiaza_activ" class="form-control" onchange="toggleAmiazeInfo()">
+                  <option value="true">✅ Activ</option>
+                  <option value="false">❌ Oprit</option>
+                </select>
+              </div>
+              <div id="set_amiaza_info" class="info-box warning" style="display:none">Mulsul de amiază este oprit. Vacile fătate vor fi muls la 12 ore interval ca celelalte.</div>
+              <button class="btn btn-primary btn-full" onclick="salveazaSetariAmiaza()">💾 Salvează setări amiază</button>
+            </div>
+          </div>
+          <!-- Card notificări -->
+          <div class="card" style="grid-column:1/-1">
+            <div class="card-header"><div class="card-title">🔔 Notificări Browser</div></div>
+            <div class="card-body">
+              <div id="notif_status" class="info-box" style="margin-bottom:14px">Verificare permisiuni notificări...</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="cerePermisiuneNotificari()">🔔 Activează notificări browser</button>
+                <button class="btn btn-secondary" onclick="testeazaNotificare()">🧪 Testează notificare</button>
+              </div>
+              <div style="margin-top:16px;font-size:0.82rem;color:var(--text-mid)">
+                <strong>Cum funcționează:</strong> La ora mulsului (și cu 30 min înainte) browserul va afișa o notificare. 
+                <span style="color:var(--amber)">⚠️ Aplicația trebuie să fie deschisă în browser (sau ca PWA instalată) pentru ca notificările să funcționeze.</span>
+              </div>
+            </div>
+          </div>
+          <!-- Preview program -->
+          <div class="card" style="grid-column:1/-1">
+            <div class="card-header"><div class="card-title">📅 Program curent mulsuri</div></div>
+            <div class="card-body" id="previewProgram">Se încarcă...</div>
+          </div>
+        </div>
       </div>
 
       <!-- REPRODUCTIE -->
@@ -812,7 +890,7 @@ async function loadVaciList() {
   vaciList = data || [];
 }
 
-const pageTitles = { dashboard:'📊 Dashboard', muls:'🥛 Muls & Curățenie', vaci:'🐄 Efectiv Vaci', vitei:'🐂 Viței', 'istoric-vitei':'📦 Istoric Viței', reproductie:'🔄 Reproducție', sanatate:'💊 Sănătate', alerte:'🔔 Alerte' };
+const pageTitles = { dashboard:'📊 Dashboard', muls:'🥛 Muls & Curățenie', vaci:'🐄 Efectiv Vaci', vitei:'🐂 Viței', 'istoric-vitei':'📦 Istoric Viței', 'istoric-vaci':'🗂️ Istoric Vaci', setari:'⚙️ Setări Mulsuri', reproductie:'🔄 Reproducție', sanatate:'💊 Sănătate', alerte:'🔔 Alerte' };
 
 function showPage(name, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -830,6 +908,8 @@ function showPage(name, el) {
   if(name==='sanatate') loadSanatate();
   if(name==='alerte') loadAlerte();
   if(name==='istoric-vitei') loadIstoricVitei();
+  if(name==='istoric-vaci') loadIstoricVaci();
+  if(name==='setari') loadSetari();
 }
 
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -1504,7 +1584,7 @@ async function vindeVacaActiva() {
   if(!confirm('Sigur marcați această vacă ca vândută?')) return;
   await db.from('vaci_lapte').update({activ:false,stare:'vanduta',data_vanzare:today()}).eq('id',currentVacaId);
   closeModal('modalFisa');
-  notif('Vaca marcată ca vândută și scoasă din efectiv.','ok');
+  notif('Vaca marcată ca vândută și scoasă din efectiv. O găsiți în Istoric Vaci.','ok');
   loadVaci(); loadDashboard();
 }
 
@@ -1622,9 +1702,11 @@ async function salveazaFatare() {
 
 async function vindeVacaById(id) {
   if(!confirm('Sigur marcați această vacă ca vândută?')) return;
-  const { error } = await db.from('vaci_lapte').update({activ:false, stare:'vanduta', data_vanzare:today()}).eq('id', id);
+  const { error } = await db.from('vaci_lapte').update({
+    activ:false, stare:'vanduta', data_vanzare:today()
+  }).eq('id', id);
   if(error){ notif('Eroare: '+error.message,'err'); return; }
-  notif('Vaca marcată ca vândută și scoasă din efectiv.','ok');
+  notif('Vaca marcată ca vândută și scoasă din efectiv. O găsiți în Istoric Vaci.','ok');
   await loadVaciList(); loadVaci(); loadDashboard();
 }
 
@@ -1704,6 +1786,232 @@ function getAgeFromDate(dataNastere, anNastere) {
   if(dataNastere) return Math.floor(daysDiff(dataNastere)/365);
   return anNastere ? new Date().getFullYear() - anNastere : 0;
 }
+
+
+// ============================================================
+// ISTORIC VACI
+// ============================================================
+async function loadIstoricVaci() {
+  const { data, error } = await db.from('vaci_lapte').select('*').eq('activ',false).order('data_vanzare',{ascending:false});
+  const tbody = document.getElementById('tblIstoricVaci');
+  if(error){ tbody.innerHTML=`<tr><td colspan="9" class="loading">Eroare: ${error.message}</td></tr>`; return; }
+  if(!data||data.length===0){ tbody.innerHTML='<tr><td colspan="9" class="loading">Nu există vaci în istoric</td></tr>'; return; }
+  tbody.innerHTML = data.map(v=>{
+    const nastere = v.data_nastere ? formatDate(v.data_nastere) : (v.an_nastere||'–');
+    const motiv = v.stare==='vanduta'?'<span class="badge b-vanduta">Vândută</span>':'<span class="badge b-uscata">Ieșită</span>';
+    return `<tr>
+      <td><strong style="font-family:'IBM Plex Mono',monospace">${v.numar_crotal||'–'}</strong></td>
+      <td>${v.nume}</td>
+      <td>${v.rasa||'–'}</td>
+      <td>${nastere}</td>
+      <td style="text-align:center">${v.nr_fatari||0}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem">${formatDate(v.data_vanzare)||'–'}</td>
+      <td>${motiv}</td>
+      <td style="font-size:0.78rem;color:var(--text-mid)">${v.observatii||'–'}</td>
+      <td><button class="btn btn-secondary btn-sm" onclick="readucVacaInFerma('${v.id}')">↩️ Readucere</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function readucVacaInFerma(id) {
+  if(!confirm('Readuceți această vacă în efectivul activ?')) return;
+  const { error } = await db.from('vaci_lapte').update({activ:true, stare:'lactatie', data_vanzare:null}).eq('id',id);
+  if(error){ notif('Eroare: '+error.message,'err'); return; }
+  notif('Vaca a fost readusă în fermă! ✅','ok');
+  loadIstoricVaci();
+  await loadVaciList(); loadDashboard();
+}
+
+// ============================================================
+// SETĂRI MULSURI & NOTIFICĂRI BROWSER
+// ============================================================
+let mulsTimer1 = null, mulsTimer2 = null, mulsTimer3 = null;
+let mulsTimer4 = null, mulsTimer5 = null, mulsTimer6 = null;
+
+function getSetariMuls() {
+  return {
+    oraDim: localStorage.getItem('muls_ora_dim')||'06:00',
+    oraSeara: localStorage.getItem('muls_ora_seara')||'18:00',
+    oraAmiaza: localStorage.getItem('muls_ora_amiaza')||'12:00',
+    amiazeActiv: localStorage.getItem('muls_amiaza_activ')!=='false'
+  };
+}
+
+function calculeazaSeara() {
+  const oraDim = document.getElementById('set_ora_dim').value;
+  if(!oraDim) return;
+  const [h,m] = oraDim.split(':').map(Number);
+  const searaH = (h+12)%24;
+  const searaStr = String(searaH).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  document.getElementById('set_ora_seara').value = searaStr;
+}
+
+function toggleAmiazeInfo() {
+  const activ = document.getElementById('set_amiaza_activ').value==='true';
+  document.getElementById('set_amiaza_info').style.display = activ?'none':'block';
+}
+
+async function salveazaSetariMuls() {
+  const oraDim = document.getElementById('set_ora_dim').value;
+  if(!oraDim){ notif('Selectați ora dimineții!','err'); return; }
+  const [h,m] = oraDim.split(':').map(Number);
+  const searaH = (h+12)%24;
+  const oraSeara = String(searaH).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  localStorage.setItem('muls_ora_dim', oraDim);
+  localStorage.setItem('muls_ora_seara', oraSeara);
+  document.getElementById('set_ora_seara').value = oraSeara;
+  notif(`Program salvat: Dimineață ${oraDim} · Seară ${oraSeara} 🥛`,'ok');
+  pornestTimereMuls();
+  afiseazaPreviewProgram();
+}
+
+async function salveazaSetariAmiaza() {
+  const oraAmiaza = document.getElementById('set_ora_amiaza').value;
+  const activ = document.getElementById('set_amiaza_activ').value==='true';
+  localStorage.setItem('muls_ora_amiaza', oraAmiaza);
+  localStorage.setItem('muls_amiaza_activ', String(activ));
+  notif(activ?`Muls amiază setat la ${oraAmiaza} ✅`:'Muls amiază dezactivat. Interval 12h între mulsuri.','ok');
+  pornestTimereMuls();
+  afiseazaPreviewProgram();
+}
+
+function loadSetari() {
+  const s = getSetariMuls();
+  document.getElementById('set_ora_dim').value = s.oraDim;
+  document.getElementById('set_ora_seara').value = s.oraSeara;
+  document.getElementById('set_ora_amiaza').value = s.oraAmiaza;
+  document.getElementById('set_amiaza_activ').value = s.amiazeActiv?'true':'false';
+  document.getElementById('set_amiaza_info').style.display = s.amiazeActiv?'none':'block';
+  verificaPermisiuniNotificari();
+  afiseazaPreviewProgram();
+}
+
+function afiseazaPreviewProgram() {
+  const s = getSetariMuls();
+  const [h,m] = s.oraDim.split(':').map(Number);
+  const preavizH = h===0?23:h-1; const preavizHStr = String(preavizH===0&&m>0?0:preavizH).padStart(2,'0');
+  const preavizMin = m; const preavizStr = `${String(preavizH).padStart(2,'0')}:${String(preavizMin).padStart(2,'0')}`;
+  const [hs,ms] = s.oraSeara.split(':').map(Number);
+  const preavizSH = hs===0?23:hs-1; const preavizSStr = `${String(preavizSH).padStart(2,'0')}:${String(ms).padStart(2,'0')}`;
+  let html = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+    <div style="background:var(--cream);border-radius:8px;padding:14px;border:1px solid var(--border)">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-light);letter-spacing:1px;margin-bottom:6px">DIMINEAȚĂ</div>
+      <div style="font-size:1.4rem;font-weight:800">${s.oraDim}</div>
+      <div style="font-size:0.75rem;color:var(--amber);margin-top:4px">⏰ Preaviz la ${preavizStr}</div>
+    </div>
+    <div style="background:var(--cream);border-radius:8px;padding:14px;border:1px solid var(--border)">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-light);letter-spacing:1px;margin-bottom:6px">SEARĂ</div>
+      <div style="font-size:1.4rem;font-weight:800">${s.oraSeara}</div>
+      <div style="font-size:0.75rem;color:var(--amber);margin-top:4px">⏰ Preaviz la ${preavizSStr}</div>
+    </div>`;
+  if(s.amiazeActiv) {
+    const [ha,ma] = s.oraAmiaza.split(':').map(Number);
+    const preavizAH = ha===0?23:ha-1; const preavizAStr = `${String(preavizAH).padStart(2,'0')}:${String(ma).padStart(2,'0')}`;
+    html += `<div style="background:#e8f5e9;border-radius:8px;padding:14px;border:1px solid var(--green-pale)">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-light);letter-spacing:1px;margin-bottom:6px">AMIAZĂ (post-fătare)</div>
+      <div style="font-size:1.4rem;font-weight:800">${s.oraAmiaza}</div>
+      <div style="font-size:0.75rem;color:var(--amber);margin-top:4px">⏰ Preaviz la ${preavizAStr}</div>
+    </div>`;
+  } else {
+    html += `<div style="background:var(--cream);border-radius:8px;padding:14px;border:1px solid var(--border);opacity:0.5">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-light);letter-spacing:1px;margin-bottom:6px">AMIAZĂ</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--text-light)">Dezactivat</div>
+    </div>`;
+  }
+  html += '</div>';
+  const el = document.getElementById('previewProgram');
+  if(el) el.innerHTML = html;
+}
+
+// ── Notificări Browser ──────────────────────────────────────
+function verificaPermisiuniNotificari() {
+  const el = document.getElementById('notif_status');
+  if(!el) return;
+  if(!('Notification' in window)) {
+    el.innerHTML = '❌ Browserul tău nu suportă notificări.'; el.className='info-box warning'; return;
+  }
+  if(Notification.permission==='granted') {
+    el.innerHTML = '✅ Notificările sunt <strong>activate</strong>. Vei primi alerte la orele de muls.'; el.className='info-box';
+  } else if(Notification.permission==='denied') {
+    el.innerHTML = '🚫 Notificările sunt <strong>blocate</strong>. Mergeți la setările browserului și permiteți notificările pentru acest site.'; el.className='info-box warning';
+  } else {
+    el.innerHTML = '⚠️ Notificările nu sunt activate. Apăsați butonul de mai jos.'; el.className='info-box warning';
+  }
+}
+
+async function cerePermisiuneNotificari() {
+  if(!('Notification' in window)){ notif('Browserul nu suportă notificări!','err'); return; }
+  const perm = await Notification.requestPermission();
+  verificaPermisiuniNotificari();
+  if(perm==='granted') {
+    notif('Notificări activate! Vei primi alerte la orele de muls. ✅','ok');
+    pornestTimereMuls();
+  } else {
+    notif('Notificările nu au fost permise.','warn');
+  }
+}
+
+function testeazaNotificare() {
+  if(Notification.permission!=='granted'){ notif('Activați mai întâi notificările!','warn'); return; }
+  new Notification('🥛 FermaPro – Test notificare', {
+    body: 'Notificările funcționează corect! Veți fi anunțat la orele de muls.',
+    icon: 'https://i.imgur.com/RYtgwMz.png',
+    tag: 'test-ferma'
+  });
+}
+
+function trimiteNotificareMuls(tip, ora) {
+  if(Notification.permission!=='granted') return;
+  const mesaje = {
+    preaviz_dim: { titlu:'⏰ Muls în 30 minute!', body:`Pregătiți-vă! Mulsul de dimineață începe la ${ora}.` },
+    muls_dim:    { titlu:'🥛 Ora mulsului!', body:`Mulsul de dimineață a început! (${ora})` },
+    preaviz_sea: { titlu:'⏰ Muls în 30 minute!', body:`Pregătiți-vă! Mulsul de seară începe la ${ora}.` },
+    muls_sea:    { titlu:'🥛 Ora mulsului!', body:`Mulsul de seară a început! (${ora})` },
+    preaviz_ami: { titlu:'⏰ Muls amiază în 30 min!', body:`Vacile fătate – mulsul de amiază la ${ora}.` },
+    muls_ami:    { titlu:'🍼 Muls amiază!', body:`Ora mulsului de amiază pentru vacile fătate! (${ora})` },
+  };
+  const m = mesaje[tip];
+  if(!m) return;
+  new Notification(m.titlu, { body: m.body, icon:'https://i.imgur.com/RYtgwMz.png', tag:'ferma-muls-'+tip });
+}
+
+function oraLaMs(oraStr) {
+  // Returnează milisecundele până la ora respectivă azi (sau mâine dacă a trecut)
+  const now = new Date();
+  const [h,m] = oraStr.split(':').map(Number);
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+  if(target <= now) target.setDate(target.getDate()+1); // mâine
+  return target - now;
+}
+
+function oraMinusTreiZeci(oraStr) {
+  const [h,m] = oraStr.split(':').map(Number);
+  let prH = h, prM = m-30;
+  if(prM<0){ prM+=60; prH=(prH-1+24)%24; }
+  return String(prH).padStart(2,'0')+':'+String(prM).padStart(2,'0');
+}
+
+function pornestTimereMuls() {
+  // Anulează timere existente
+  [mulsTimer1,mulsTimer2,mulsTimer3,mulsTimer4,mulsTimer5,mulsTimer6].forEach(t=>{ if(t) clearTimeout(t); });
+  const s = getSetariMuls();
+  // 2 mulsuri de bază
+  function scheduleazaMuls(oraStr, tipPrea, tipMuls) {
+    const preavizOra = oraMinusTreiZeci(oraStr);
+    const msP = oraLaMs(preavizOra);
+    const msM = oraLaMs(oraStr);
+    setTimeout(()=>{ trimiteNotificareMuls(tipPrea, oraStr); scheduleazaMuls(oraStr,tipPrea,tipMuls); }, msP);
+    setTimeout(()=>{ trimiteNotificareMuls(tipMuls, oraStr); }, msM);
+  }
+  scheduleazaMuls(s.oraDim, 'preaviz_dim', 'muls_dim');
+  scheduleazaMuls(s.oraSeara, 'preaviz_sea', 'muls_sea');
+  if(s.amiazeActiv) scheduleazaMuls(s.oraAmiaza, 'preaviz_ami', 'muls_ami');
+}
+
+// Pornește timere la încărcarea aplicației dacă notificările sunt permise
+window.addEventListener('load', ()=>{
+  if(Notification.permission==='granted') setTimeout(pornestTimereMuls, 3000);
+});
 
 </script>
 </body>
