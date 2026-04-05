@@ -867,6 +867,8 @@ function startApp(email) {
   document.getElementById('userName').textContent = email.split('@')[0];
   document.getElementById('userRole').textContent = 'Utilizator fermă';
   initApp();
+  // Înregistrăm player ID OneSignal după login
+  setTimeout(inregistreazaOneSignalPlayer, 2000);
 }
 
 async function doLogout() {
@@ -1829,12 +1831,25 @@ let mulsTimer1 = null, mulsTimer2 = null, mulsTimer3 = null;
 let mulsTimer4 = null, mulsTimer5 = null, mulsTimer6 = null;
 
 function getSetariMuls() {
+  // Citim din localStorage (cache local, sincronizat cu Supabase)
   return {
     oraDim: localStorage.getItem('muls_ora_dim')||'06:00',
     oraSeara: localStorage.getItem('muls_ora_seara')||'18:00',
     oraAmiaza: localStorage.getItem('muls_ora_amiaza')||'12:00',
     amiazeActiv: localStorage.getItem('muls_amiaza_activ')!=='false'
   };
+}
+
+async function incarcaSetariDinSupabase() {
+  if(!currentUser) return;
+  const { data } = await db.from('setari_muls').select('*').eq('user_id', currentUser.id).single();
+  if(data) {
+    localStorage.setItem('muls_ora_dim', data.ora_dim||'06:00');
+    localStorage.setItem('muls_ora_seara', data.ora_seara||'18:00');
+    localStorage.setItem('muls_ora_amiaza', data.ora_amiaza||'12:00');
+    localStorage.setItem('muls_amiaza_activ', String(data.amiaza_activ!==false));
+    console.log('Setări muls încărcate din Supabase:', data);
+  }
 }
 
 function calculeazaSeara() {
@@ -1860,6 +1875,17 @@ async function salveazaSetariMuls() {
   localStorage.setItem('muls_ora_dim', oraDim);
   localStorage.setItem('muls_ora_seara', oraSeara);
   document.getElementById('set_ora_seara').value = oraSeara;
+  // Salvează în Supabase pentru notificări push
+  if(currentUser) {
+    const existing = await db.from('setari_muls').select('id').eq('user_id', currentUser.id).single();
+    const oraAmiaza = localStorage.getItem('muls_ora_amiaza')||'12:00';
+    const amAct = localStorage.getItem('muls_amiaza_activ')!=='false';
+    if(existing.data) {
+      await db.from('setari_muls').update({ ora_dim:oraDim, ora_seara:oraSeara, updated_at:new Date().toISOString() }).eq('user_id', currentUser.id);
+    } else {
+      await db.from('setari_muls').insert({ user_id:currentUser.id, ora_dim:oraDim, ora_seara:oraSeara, ora_amiaza:oraAmiaza, amiaza_activ:amAct });
+    }
+  }
   notif(`Program salvat: Dimineață ${oraDim} · Seară ${oraSeara} 🥛`,'ok');
   pornestTimereMuls();
   afiseazaPreviewProgram();
@@ -1870,12 +1896,24 @@ async function salveazaSetariAmiaza() {
   const activ = document.getElementById('set_amiaza_activ').value==='true';
   localStorage.setItem('muls_ora_amiaza', oraAmiaza);
   localStorage.setItem('muls_amiaza_activ', String(activ));
+  // Salvează în Supabase
+  if(currentUser) {
+    const oraDim = localStorage.getItem('muls_ora_dim')||'06:00';
+    const oraSeara = localStorage.getItem('muls_ora_seara')||'18:00';
+    const existing = await db.from('setari_muls').select('id').eq('user_id', currentUser.id).single();
+    if(existing.data) {
+      await db.from('setari_muls').update({ ora_amiaza:oraAmiaza, amiaza_activ:activ, updated_at:new Date().toISOString() }).eq('user_id', currentUser.id);
+    } else {
+      await db.from('setari_muls').insert({ user_id:currentUser.id, ora_dim:oraDim, ora_seara:oraSeara, ora_amiaza:oraAmiaza, amiaza_activ:activ });
+    }
+  }
   notif(activ?`Muls amiază setat la ${oraAmiaza} ✅`:'Muls amiază dezactivat. Interval 12h între mulsuri.','ok');
   pornestTimereMuls();
   afiseazaPreviewProgram();
 }
 
-function loadSetari() {
+async function loadSetari() {
+  await incarcaSetariDinSupabase();
   const s = getSetariMuls();
   document.getElementById('set_ora_dim').value = s.oraDim;
   document.getElementById('set_ora_seara').value = s.oraSeara;
@@ -1924,41 +1962,11 @@ function afiseazaPreviewProgram() {
 }
 
 // ── Notificări Browser ──────────────────────────────────────
-function verificaPermisiuniNotificari() {
-  const el = document.getElementById('notif_status');
-  if(!el) return;
-  if(!('Notification' in window)) {
-    el.innerHTML = '❌ Browserul tău nu suportă notificări.'; el.className='info-box warning'; return;
-  }
-  if(Notification.permission==='granted') {
-    el.innerHTML = '✅ Notificările sunt <strong>activate</strong>. Vei primi alerte la orele de muls.'; el.className='info-box';
-  } else if(Notification.permission==='denied') {
-    el.innerHTML = '🚫 Notificările sunt <strong>blocate</strong>. Mergeți la setările browserului și permiteți notificările pentru acest site.'; el.className='info-box warning';
-  } else {
-    el.innerHTML = '⚠️ Notificările nu sunt activate. Apăsați butonul de mai jos.'; el.className='info-box warning';
-  }
-}
+// verificaPermisiuniNotificari – versiunea cu OneSignal e mai jos
 
-async function cerePermisiuneNotificari() {
-  if(!('Notification' in window)){ notif('Browserul nu suportă notificări!','err'); return; }
-  const perm = await Notification.requestPermission();
-  verificaPermisiuniNotificari();
-  if(perm==='granted') {
-    notif('Notificări activate! Vei primi alerte la orele de muls. ✅','ok');
-    pornestTimereMuls();
-  } else {
-    notif('Notificările nu au fost permise.','warn');
-  }
-}
+// cerePermisiuneNotificari - definită mai jos cu suport OneSignal complet
 
-function testeazaNotificare() {
-  if(Notification.permission!=='granted'){ notif('Activați mai întâi notificările!','warn'); return; }
-  new Notification('🥛 FermaPro – Test notificare', {
-    body: 'Notificările funcționează corect! Veți fi anunțat la orele de muls.',
-    icon: 'https://i.imgur.com/RYtgwMz.png',
-    tag: 'test-ferma'
-  });
-}
+// testeazaNotificare - mutată mai jos
 
 function trimiteNotificareMuls(tip, ora) {
   if(Notification.permission!=='granted') return;
@@ -2013,6 +2021,112 @@ window.addEventListener('load', ()=>{
   if(Notification.permission==='granted') setTimeout(pornestTimereMuls, 3000);
 });
 
+
+// ============================================================
+// ONESIGNAL PLAYER ID – înregistrare pentru push notifications
+// ============================================================
+async function inregistreazaOneSignalPlayer() {
+  try {
+    if(!currentUser) return;
+    // Obținem player ID din OneSignal SDK
+    if(typeof OneSignal === 'undefined') return;
+    const playerId = await OneSignal.getUserId();
+    if(!playerId) {
+      console.log('OneSignal player ID indisponibil (notificații neacceptate sau SDK neîncărcat)');
+      return;
+    }
+    // Salvăm în Supabase (upsert pe player_id)
+    const { error } = await db.from('onesignal_players').upsert(
+      { player_id: playerId, user_id: currentUser.id, device_info: navigator.userAgent },
+      { onConflict: 'player_id' }
+    );
+    if(error) console.error('Eroare salvare player ID:', error.message);
+    else console.log('Player ID OneSignal înregistrat:', playerId);
+  } catch(e) {
+    console.log('OneSignal player registration:', e.message);
+  }
+}
+
+// Înregistrăm și când OneSignal confirmă subscripția
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(function(OneSignal) {
+  OneSignal.on('subscriptionChange', function(isSubscribed) {
+    if(isSubscribed) {
+      console.log('Utilizatorul s-a abonat la notificări OneSignal');
+      setTimeout(inregistreazaOneSignalPlayer, 1000);
+    }
+  });
+});
+
+// Actualizăm loadSetari pentru a afișa statusul OneSignal real
+async function verificaPermisiuniNotificari() {
+  const el = document.getElementById('notif_status');
+  if(!el) return;
+  // Status browser Notification API
+  if(!('Notification' in window)) {
+    el.innerHTML = '❌ Browserul tău nu suportă notificări.';
+    el.className = 'info-box warning'; return;
+  }
+  // Status OneSignal
+  let oneSignalOk = false;
+  try {
+    if(typeof OneSignal !== 'undefined') {
+      const pid = await OneSignal.getUserId();
+      oneSignalOk = !!pid;
+    }
+  } catch(e) {}
+
+  if(Notification.permission==='granted' && oneSignalOk) {
+    el.innerHTML = '✅ Notificările sunt <strong>complet activate</strong>. Vei primi alerte și când browserul e închis (OneSignal) și când e deschis (browser).';
+    el.className = 'info-box';
+  } else if(Notification.permission==='granted' && !oneSignalOk) {
+    el.innerHTML = '🔶 Notificările browser sunt active, dar <strong>OneSignal nu este conectat</strong> – nu vei primi notificări când browserul e închis. Apăsați "Activează notificări".';
+    el.className = 'info-box warning';
+  } else if(Notification.permission==='denied') {
+    el.innerHTML = '🚫 Notificările sunt <strong>blocate</strong>. Mergeți la setările browserului și permiteți notificările pentru acest site.';
+    el.className = 'info-box warning';
+  } else {
+    el.innerHTML = '⚠️ Notificările nu sunt activate. Apăsați butonul de mai jos.';
+    el.className = 'info-box warning';
+  }
+}
+
+async function cerePermisiuneNotificari() {
+  if(!('Notification' in window)){ notif('Browserul nu suportă notificări!','err'); return; }
+  // Activăm prin OneSignal (care gestionează atât browser cât și push)
+  try {
+    if(typeof OneSignal !== 'undefined') {
+      await OneSignal.showNativePrompt();
+      setTimeout(async () => {
+        await inregistreazaOneSignalPlayer();
+        await verificaPermisiuniNotificari();
+      }, 1500);
+      notif('Notificări activate! Vei primi alerte și când browserul e închis. ✅','ok');
+      pornestTimereMuls();
+      return;
+    }
+  } catch(e) { console.log('OneSignal prompt error:', e); }
+  // Fallback: browser nativ
+  const perm = await Notification.requestPermission();
+  await verificaPermisiuniNotificari();
+  if(perm==='granted') {
+    notif('Notificări browser activate! ✅','ok');
+    pornestTimereMuls();
+  } else {
+    notif('Notificările nu au fost permise.','warn');
+  }
+}
+
+
+function testeazaNotificare() {
+  if(Notification.permission!=='granted'){ notif('Activați mai întâi notificările!','warn'); return; }
+  new Notification('🥛 FermaPro – Test notificare', {
+    body: 'Notificările funcționează! Veți fi anunțat la orele de muls.',
+    icon: 'https://i.imgur.com/RYtgwMz.png',
+    tag: 'test-ferma'
+  });
+  notif('Notificare test trimisă!','ok');
+}
 </script>
 </body>
 </html>
