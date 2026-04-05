@@ -5,106 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FermaPro – Aplicație Fermă</title>
 <meta name="theme-color" content="#1a2e1a">
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer>
-// ============================================================
-// EDITARE SANATATE
-// ============================================================
-let editSanId = null;
-
-async function openEditareSan(id) {
-  editSanId = parseInt(id);
-  const { data: s, error } = await db.from('sanatate').select('*').eq('id', parseInt(id)).single();
-  if(error||!s){ notif('Eroare la încărcare: '+(error?.message||'negăsit'),'err'); return; }
-  document.getElementById('es_tip').value = s.tip||'tratament';
-  document.getElementById('es_data').value = s.data||'';
-  document.getElementById('es_diag').value = s.diagnostic||'';
-  document.getElementById('es_med').value = s.medicament||'';
-  document.getElementById('es_doza').value = s.doza||'';
-  document.getElementById('es_durata').value = s.durata_zile||'';
-  document.getElementById('es_carantina').value = s.carantina_lapte_zile||0;
-  document.getElementById('es_urmator').value = s.data_urmator||'';
-  document.getElementById('es_vet').value = s.veterinar||'';
-  document.getElementById('es_obs').value = s.observatii||'';
-  openModal('modalEditareSan');
-}
-
-async function salveazaEditareSan() {
-  const durata = parseInt(document.getElementById('es_durata').value)||null;
-  const data = document.getElementById('es_data').value;
-  const { error } = await db.from('sanatate').update({
-    tip: document.getElementById('es_tip').value,
-    data, diagnostic: document.getElementById('es_diag').value,
-    medicament: document.getElementById('es_med').value,
-    doza: document.getElementById('es_doza').value,
-    durata_zile: durata,
-    carantina_lapte_zile: parseInt(document.getElementById('es_carantina').value)||0,
-    data_urmator: document.getElementById('es_urmator').value||null,
-    veterinar: document.getElementById('es_vet').value,
-    observatii: document.getElementById('es_obs').value,
-    data_sfarsit: durata&&data?addDays(data,durata):null
-  }).eq('id', parseInt(editSanId));
-  if(error){ notif('Eroare: '+error.message,'err'); return; }
-  closeModal('modalEditareSan');
-  notif('Înregistrare actualizată! ✅','ok');
-  loadSanatate();
-}
-
-// ============================================================
-// VINDE VITEL
-// ============================================================
-async function vindeVitel(id) {
-  currentVitelId = parseInt(id);
-  document.getElementById('vv_data').value = today();
-  document.getElementById('vv_stare').value = 'vandut';
-  openModal('modalVitelVandut');
-}
-
-// ============================================================
-// FATARE
-// ============================================================
-let fatareMontaId = null;
-let fatareVacaId = null;
-
-function toggleVitelViu() {
-  const viu = document.getElementById('fat_viu').value;
-  document.getElementById('fat_vitel_section').style.display = viu==='viu'?'block':'none';
-}
-
-function openFatare(montaId, vacaId) {
-  fatareMontaId = montaId;
-  fatareVacaId = vacaId;
-  document.getElementById('fat_data').value = today();
-  document.getElementById('fat_vitel_section').style.display = 'block';
-  openModal('modalFatare');
-}
-
-async function salveazaFatare() {
-  const dataFatare = document.getElementById('fat_data').value;
-  if(!dataFatare){ notif('Completați data fătării!','err'); return; }
-  const viu = document.getElementById('fat_viu').value === 'viu';
-  await db.from('monte').update({ fatare_finalizata:true, data_fatare_reala:dataFatare }).eq('id', fatareMontaId);
-  const { data: vaca } = await db.from('vaci_lapte').select('nr_fatari').eq('id', fatareVacaId).single();
-  await db.from('vaci_lapte').update({ stare:'lactatie', nr_fatari:(vaca?.nr_fatari||0)+1 }).eq('id', fatareVacaId);
-  const fatareObj = {
-    vaca_id:fatareVacaId, data_fatare:dataFatare,
-    tip_fatare:document.getElementById('fat_tip').value,
-    sex_vitel:document.getElementById('fat_sex').value,
-    vitel_sanatos:viu, vitel_vandut:false, vitel_ramas_ferma:viu
-  };
-  if(viu){
-    fatareObj.nume_vitel = document.getElementById('fat_nume_vitel').value||null;
-    fatareObj.crotal_vitel = document.getElementById('fat_crotal_vitel').value||null;
-    fatareObj.greutate_vitel = parseFloat(document.getElementById('fat_greutate').value)||null;
-    fatareObj.informatii_tata = document.getElementById('fat_tata').value||null;
-  }
-  fatareObj.observatii = document.getElementById('fat_obs').value||null;
-  await db.from('fatari').insert(fatareObj);
-  closeModal('modalFatare');
-  notif(viu?'Fătare confirmată! Vițelul adăugat automat 🐂':'Fătare confirmată. Vițel decedat notat.','ok');
-  loadVaci(); loadDashboard();
-}
-
-</script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
@@ -112,206 +13,8 @@ async function salveazaFatare() {
       appId: "c874a84b-0e94-4316-9304-71e4471c87e4",
     });
   });
-
-// ============================================================
-// EDITARE SANATATE
-// ============================================================
-editSanId = null;
-
-async function openEditareSan(id) {
-  editSanId = parseInt(id);
-  const { data: s, error } = await db.from('sanatate').select('*').eq('id', parseInt(id)).single();
-  if(error||!s){ notif('Eroare la încărcare: '+(error?.message||'negăsit'),'err'); return; }
-  document.getElementById('es_tip').value = s.tip||'tratament';
-  document.getElementById('es_data').value = s.data||'';
-  document.getElementById('es_diag').value = s.diagnostic||'';
-  document.getElementById('es_med').value = s.medicament||'';
-  document.getElementById('es_doza').value = s.doza||'';
-  document.getElementById('es_durata').value = s.durata_zile||'';
-  document.getElementById('es_carantina').value = s.carantina_lapte_zile||0;
-  document.getElementById('es_urmator').value = s.data_urmator||'';
-  document.getElementById('es_vet').value = s.veterinar||'';
-  document.getElementById('es_obs').value = s.observatii||'';
-  openModal('modalEditareSan');
-}
-
-async function salveazaEditareSan() {
-  const durata = parseInt(document.getElementById('es_durata').value)||null;
-  const data = document.getElementById('es_data').value;
-  const { error } = await db.from('sanatate').update({
-    tip: document.getElementById('es_tip').value,
-    data, diagnostic: document.getElementById('es_diag').value,
-    medicament: document.getElementById('es_med').value,
-    doza: document.getElementById('es_doza').value,
-    durata_zile: durata,
-    carantina_lapte_zile: parseInt(document.getElementById('es_carantina').value)||0,
-    data_urmator: document.getElementById('es_urmator').value||null,
-    veterinar: document.getElementById('es_vet').value,
-    observatii: document.getElementById('es_obs').value,
-    data_sfarsit: durata&&data?addDays(data,durata):null
-  }).eq('id', parseInt(editSanId));
-  if(error){ notif('Eroare: '+error.message,'err'); return; }
-  closeModal('modalEditareSan');
-  notif('Înregistrare actualizată! ✅','ok');
-  loadSanatate();
-}
-
-// ============================================================
-// VINDE VITEL
-// ============================================================
-async function vindeVitel(id) {
-  currentVitelId = parseInt(id);
-  document.getElementById('vv_data').value = today();
-  document.getElementById('vv_stare').value = 'vandut';
-  openModal('modalVitelVandut');
-}
-
-// ============================================================
-// FATARE
-// ============================================================
-fatareMontaId = null;
-fatareVacaId = null;
-
-function toggleVitelViu() {
-  const viu = document.getElementById('fat_viu').value;
-  document.getElementById('fat_vitel_section').style.display = viu==='viu'?'block':'none';
-}
-
-function openFatare(montaId, vacaId) {
-  fatareMontaId = montaId;
-  fatareVacaId = vacaId;
-  document.getElementById('fat_data').value = today();
-  document.getElementById('fat_vitel_section').style.display = 'block';
-  openModal('modalFatare');
-}
-
-async function salveazaFatare() {
-  const dataFatare = document.getElementById('fat_data').value;
-  if(!dataFatare){ notif('Completați data fătării!','err'); return; }
-  const viu = document.getElementById('fat_viu').value === 'viu';
-  await db.from('monte').update({ fatare_finalizata:true, data_fatare_reala:dataFatare }).eq('id', fatareMontaId);
-  const { data: vaca } = await db.from('vaci_lapte').select('nr_fatari').eq('id', fatareVacaId).single();
-  await db.from('vaci_lapte').update({ stare:'lactatie', nr_fatari:(vaca?.nr_fatari||0)+1 }).eq('id', fatareVacaId);
-  const fatareObj = {
-    vaca_id:fatareVacaId, data_fatare:dataFatare,
-    tip_fatare:document.getElementById('fat_tip').value,
-    sex_vitel:document.getElementById('fat_sex').value,
-    vitel_sanatos:viu, vitel_vandut:false, vitel_ramas_ferma:viu
-  };
-  if(viu){
-    fatareObj.nume_vitel = document.getElementById('fat_nume_vitel').value||null;
-    fatareObj.crotal_vitel = document.getElementById('fat_crotal_vitel').value||null;
-    fatareObj.greutate_vitel = parseFloat(document.getElementById('fat_greutate').value)||null;
-    fatareObj.informatii_tata = document.getElementById('fat_tata').value||null;
-  }
-  fatareObj.observatii = document.getElementById('fat_obs').value||null;
-  await db.from('fatari').insert(fatareObj);
-  closeModal('modalFatare');
-  notif(viu?'Fătare confirmată! Vițelul adăugat automat 🐂':'Fătare confirmată. Vițel decedat notat.','ok');
-  loadVaci(); loadDashboard();
-}
-
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-// ============================================================
-// EDITARE SANATATE
-// ============================================================
-editSanId = null;
-
-async function openEditareSan(id) {
-  editSanId = parseInt(id);
-  const { data: s, error } = await db.from('sanatate').select('*').eq('id', parseInt(id)).single();
-  if(error||!s){ notif('Eroare la încărcare: '+(error?.message||'negăsit'),'err'); return; }
-  document.getElementById('es_tip').value = s.tip||'tratament';
-  document.getElementById('es_data').value = s.data||'';
-  document.getElementById('es_diag').value = s.diagnostic||'';
-  document.getElementById('es_med').value = s.medicament||'';
-  document.getElementById('es_doza').value = s.doza||'';
-  document.getElementById('es_durata').value = s.durata_zile||'';
-  document.getElementById('es_carantina').value = s.carantina_lapte_zile||0;
-  document.getElementById('es_urmator').value = s.data_urmator||'';
-  document.getElementById('es_vet').value = s.veterinar||'';
-  document.getElementById('es_obs').value = s.observatii||'';
-  openModal('modalEditareSan');
-}
-
-async function salveazaEditareSan() {
-  const durata = parseInt(document.getElementById('es_durata').value)||null;
-  const data = document.getElementById('es_data').value;
-  const { error } = await db.from('sanatate').update({
-    tip: document.getElementById('es_tip').value,
-    data, diagnostic: document.getElementById('es_diag').value,
-    medicament: document.getElementById('es_med').value,
-    doza: document.getElementById('es_doza').value,
-    durata_zile: durata,
-    carantina_lapte_zile: parseInt(document.getElementById('es_carantina').value)||0,
-    data_urmator: document.getElementById('es_urmator').value||null,
-    veterinar: document.getElementById('es_vet').value,
-    observatii: document.getElementById('es_obs').value,
-    data_sfarsit: durata&&data?addDays(data,durata):null
-  }).eq('id', parseInt(editSanId));
-  if(error){ notif('Eroare: '+error.message,'err'); return; }
-  closeModal('modalEditareSan');
-  notif('Înregistrare actualizată! ✅','ok');
-  loadSanatate();
-}
-
-// ============================================================
-// VINDE VITEL
-// ============================================================
-async function vindeVitel(id) {
-  currentVitelId = parseInt(id);
-  document.getElementById('vv_data').value = today();
-  document.getElementById('vv_stare').value = 'vandut';
-  openModal('modalVitelVandut');
-}
-
-// ============================================================
-// FATARE
-// ============================================================
-fatareMontaId = null;
-fatareVacaId = null;
-
-function toggleVitelViu() {
-  const viu = document.getElementById('fat_viu').value;
-  document.getElementById('fat_vitel_section').style.display = viu==='viu'?'block':'none';
-}
-
-function openFatare(montaId, vacaId) {
-  fatareMontaId = montaId;
-  fatareVacaId = vacaId;
-  document.getElementById('fat_data').value = today();
-  document.getElementById('fat_vitel_section').style.display = 'block';
-  openModal('modalFatare');
-}
-
-async function salveazaFatare() {
-  const dataFatare = document.getElementById('fat_data').value;
-  if(!dataFatare){ notif('Completați data fătării!','err'); return; }
-  const viu = document.getElementById('fat_viu').value === 'viu';
-  await db.from('monte').update({ fatare_finalizata:true, data_fatare_reala:dataFatare }).eq('id', fatareMontaId);
-  const { data: vaca } = await db.from('vaci_lapte').select('nr_fatari').eq('id', fatareVacaId).single();
-  await db.from('vaci_lapte').update({ stare:'lactatie', nr_fatari:(vaca?.nr_fatari||0)+1 }).eq('id', fatareVacaId);
-  const fatareObj = {
-    vaca_id:fatareVacaId, data_fatare:dataFatare,
-    tip_fatare:document.getElementById('fat_tip').value,
-    sex_vitel:document.getElementById('fat_sex').value,
-    vitel_sanatos:viu, vitel_vandut:false, vitel_ramas_ferma:viu
-  };
-  if(viu){
-    fatareObj.nume_vitel = document.getElementById('fat_nume_vitel').value||null;
-    fatareObj.crotal_vitel = document.getElementById('fat_crotal_vitel').value||null;
-    fatareObj.greutate_vitel = parseFloat(document.getElementById('fat_greutate').value)||null;
-    fatareObj.informatii_tata = document.getElementById('fat_tata').value||null;
-  }
-  fatareObj.observatii = document.getElementById('fat_obs').value||null;
-  await db.from('fatari').insert(fatareObj);
-  closeModal('modalFatare');
-  notif(viu?'Fătare confirmată! Vițelul adăugat automat 🐂':'Fătare confirmată. Vițel decedat notat.','ok');
-  loadVaci(); loadDashboard();
-}
-
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
 :root{
@@ -1000,6 +703,7 @@ tr:hover td{background:rgba(74,140,63,0.03);}
     </div>
   </div>
 </div>
+
 
 <script>
 const SUPA_URL = 'https://ksiqehbvjjflrjzcsjku.supabase.co';
@@ -1729,7 +1433,7 @@ function notif(text,type='ok') {
 // ============================================================
 // EDITARE SANATATE
 // ============================================================
-editSanId = null;
+let editSanId = null;
 
 async function openEditareSan(id) {
   editSanId = parseInt(id);
@@ -1782,8 +1486,8 @@ async function vindeVitel(id) {
 // ============================================================
 // FATARE
 // ============================================================
-fatareMontaId = null;
-fatareVacaId = null;
+let fatareMontaId = null;
+let fatareVacaId = null;
 
 function toggleVitelViu() {
   const viu = document.getElementById('fat_viu').value;
@@ -1824,6 +1528,13 @@ async function salveazaFatare() {
   loadVaci(); loadDashboard();
 }
 
+async function vindeVacaById(id) {
+  if(!confirm('Sigur marcați această vacă ca vândută?')) return;
+  const { error } = await db.from('vaci_lapte').update({activ:false, stare:'vanduta', data_vanzare:today()}).eq('id', id);
+  if(error){ notif('Eroare: '+error.message,'err'); return; }
+  notif('Vaca marcată ca vândută și scoasă din efectiv.','ok');
+  await loadVaciList(); loadVaci(); loadDashboard();
+}
 </script>
 </body>
 </html>
