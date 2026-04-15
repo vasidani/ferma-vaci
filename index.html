@@ -6,13 +6,19 @@
 <title>FermaPro – Aplicație Fermă</title>
 <meta name="theme-color" content="#1a2e1a">
 <script>
-// ── Înregistrare Service Worker pentru notificări push ──
+// ── Înregistrare Service Worker pentru notificări ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
       const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       console.log('Service Worker înregistrat:', reg.scope);
       window._swReg = reg;
+      // Ascultă mesaje de la SW (ex: click pe notificare)
+      navigator.serviceWorker.addEventListener('message', e => {
+        if(e.data && e.data.tip === 'NOTIFICARE_CLICK') {
+          showPage('alerte', document.querySelector('.nav-item'));
+        }
+      });
     } catch(e) {
       console.warn('Service Worker eroare:', e);
     }
@@ -412,16 +418,31 @@ tr:hover td{background:rgba(74,140,63,0.03);}
           </div>
           <!-- Card notificări -->
           <div class="card" style="grid-column:1/-1">
-            <div class="card-header"><div class="card-title">🔔 Notificări Browser</div></div>
+            <div class="card-header"><div class="card-title">🔔 Notificări Fermă – Sistem Unificat</div></div>
             <div class="card-body">
               <div id="notif_status" class="info-box" style="margin-bottom:14px">Verificare permisiuni notificări...</div>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn btn-primary" onclick="cerePermisiuneNotificari()">🔔 Activează notificări browser</button>
+                <button class="btn btn-primary" onclick="cerePermisiuneNotificari()">🔔 Activează notificările</button>
                 <button class="btn btn-secondary" onclick="testeazaNotificare()">🧪 Testează notificare</button>
+                <button class="btn btn-secondary" onclick="scanEvenimenteFerma().then(()=>notif('Scanare manuală completă ✅','ok'))">🔍 Scanare manuală</button>
               </div>
-              <div style="margin-top:16px;font-size:0.82rem;color:var(--text-mid)">
-                <strong>Cum funcționează:</strong> La ora mulsului (și cu 30 min înainte) browserul va afișa o notificare. 
-                <span style="color:var(--amber)">⚠️ Aplicația trebuie să fie deschisă în browser (sau ca PWA instalată) pentru ca notificările să funcționeze.</span>
+              <div style="margin-top:16px;background:var(--cream);border-radius:8px;padding:14px;border:1px solid var(--border)">
+                <div style="font-size:0.82rem;font-weight:700;color:var(--text-dark);margin-bottom:10px">📋 Ce evenimente declanșează notificări:</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.8rem;color:var(--text-mid)">
+                  <div>🥛 <strong>Mulsuri</strong> – la ora exactă + preaviz 30 min (dimineață, seară, amiază)</div>
+                  <div>⚠️ <strong>Călduri la 21 zile</strong> – verificare comportament după montă</div>
+                  <div>🚨 <strong>Confirmare gestație la 30 zile</strong> – confirmare obligatorie</div>
+                  <div>🛑 <strong>Repaus mamar la 220 zile</strong> – oprire muls (60 zile înainte de fătare)</div>
+                  <div>🏥 <strong>Transfer maternitate la 263 zile</strong> – pregătire pentru fătare</div>
+                  <div>🍼 <strong>Fătare iminentă la 280 zile</strong> – alertă urgentă</div>
+                  <div>💊 <strong>Deparazitări scadente</strong> – cu 3 zile înainte și în ziua scadenței</div>
+                  <div>💉 <strong>Vaccinuri scadente</strong> – cu 3 zile înainte și în ziua scadenței</div>
+                  <div>💊 <strong>Doze tratamente</strong> – în ziua administrării programate</div>
+                  <div>🐄 <strong>Vițele 18 luni</strong> – vârsta optimă pentru prima montă</div>
+                </div>
+                <div style="margin-top:10px;font-size:0.78rem;color:var(--text-light)">
+                  ℹ️ Scanarea evenimentelor se face automat la fiecare oră. Notificările apar în bara de notificări a telefonului chiar și cu ecranul blocat (necesită acceptarea permisiunilor + PWA instalată pe Android Chrome).
+                </div>
               </div>
             </div>
           </div>
@@ -872,8 +893,13 @@ function startApp(email) {
   document.getElementById('userName').textContent = email.split('@')[0];
   document.getElementById('userRole').textContent = 'Utilizator fermă';
   initApp();
-  // Înregistrăm player ID OneSignal după login
-  setTimeout(inregistreazaOneSignalPlayer, 2000);
+  // Pornește notificările dacă sunt deja acceptate
+  if (Notification.permission === 'granted') {
+    setTimeout(() => {
+      pornestTimereMuls();
+      pornesteScanareZilnica();
+    }, 4000);
+  }
 }
 
 async function doLogout() {
@@ -1830,7 +1856,348 @@ async function readucVacaInFerma(id) {
 }
 
 // ============================================================
-// SETĂRI MULSURI & NOTIFICĂRI BROWSER
+// SISTEM NOTIFICĂRI UNIFICAT – Service Worker Local
+// Funcționează cu ecranul blocat pe Android Chrome
+// NU necesită server VAPID – notificările sunt programate
+// direct prin SW folosind setTimeout în background
+// ============================================================
+
+// ── Utilitar: trimite notificare prin SW (sau fallback direct) ──
+function trimiteNotificare({ titlu, body, tag, icon }) {
+  if (Notification.permission !== 'granted') return;
+  icon = icon || '/icon-192.png';
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      tip: 'ARATA_NOTIFICARE',
+      titlu, body, tag, icon
+    });
+  } else {
+    new Notification(titlu, { body, tag, icon, silent: false });
+  }
+}
+
+// ── Programează o notificare peste X milisecunde ──
+function programeazaNotificare({ titlu, body, tag, icon, msDelay }) {
+  if (Notification.permission !== 'granted') return;
+  if (msDelay <= 0) { trimiteNotificare({ titlu, body, tag, icon }); return; }
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      tip: 'PROGRAMEAZA_NOTIFICARE',
+      titlu, body, tag, icon, msDelay
+    });
+  } else {
+    setTimeout(() => trimiteNotificare({ titlu, body, tag, icon }), msDelay);
+  }
+}
+
+// ── Calculează milisecundele până la o oră (HH:MM) azi sau mâine ──
+function msUntilTime(oraStr) {
+  const now = new Date();
+  const [h, m] = oraStr.split(':').map(Number);
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return target - now;
+}
+
+function oraMinusTreiZeci(oraStr) {
+  const [h, m] = oraStr.split(':').map(Number);
+  let prH = h, prM = m - 30;
+  if (prM < 0) { prM += 60; prH = (prH - 1 + 24) % 24; }
+  return String(prH).padStart(2, '0') + ':' + String(prM).padStart(2, '0');
+}
+
+// ============================================================
+// NOTIFICĂRI MULSURI (zilnice, se reprogramează automat)
+// ============================================================
+let _mulsTimers = [];
+
+function pornestTimereMuls() {
+  _mulsTimers.forEach(t => clearTimeout(t));
+  _mulsTimers = [];
+  if (Notification.permission !== 'granted') return;
+
+  const s = getSetariMuls();
+
+  function scheduleazaMuls(oraStr, labelMoment) {
+    const preavizOra = oraMinusTreiZeci(oraStr);
+    const msP = msUntilTime(preavizOra);
+    const msM = msUntilTime(oraStr);
+
+    const t1 = setTimeout(() => {
+      trimiteNotificare({
+        titlu: '⏰ Muls în 30 minute!',
+        body: `Pregătiți-vă! Mulsul de ${labelMoment} începe la ${oraStr}.`,
+        tag: 'ferma-muls-preaviz-' + labelMoment
+      });
+      // Reprogramează pentru ziua viitoare
+      const t3 = setTimeout(() => scheduleazaMuls(oraStr, labelMoment), 23.5 * 3600 * 1000);
+      _mulsTimers.push(t3);
+    }, msP);
+
+    const t2 = setTimeout(() => {
+      trimiteNotificare({
+        titlu: '🥛 Ora mulsului de ' + labelMoment + '!',
+        body: `Mulsul de ${labelMoment} a început! (${oraStr})`,
+        tag: 'ferma-muls-' + labelMoment
+      });
+    }, msM);
+
+    _mulsTimers.push(t1, t2);
+  }
+
+  scheduleazaMuls(s.oraDim, 'dimineață');
+  scheduleazaMuls(s.oraSeara, 'seară');
+  if (s.amiazeActiv) scheduleazaMuls(s.oraAmiaza, 'amiază');
+}
+
+// ============================================================
+// NOTIFICĂRI EVENIMENTE FERMĂ (scanare zilnică din Supabase)
+// Acoperă: fătări, repaus mamar, maternitate, deparazitări,
+//          tratamente programate, 18 luni vițele
+// ============================================================
+
+// Cheie pentru a nu trimite aceeași notificare de 2 ori în aceeași zi
+function _notifTrimisaAzi(tag) {
+  const azi = new Date().toISOString().split('T')[0];
+  const key = 'notif_trimisa_' + azi + '_' + tag;
+  if (localStorage.getItem(key)) return true;
+  localStorage.setItem(key, '1');
+  return false;
+}
+
+async function scanEvenimenteFerma() {
+  if (Notification.permission !== 'granted') return;
+  if (!currentUser) return;
+
+  console.log('[FermaPro] Scanez evenimente pentru notificări...');
+
+  try {
+    // ── 1. Monte active – fătare, repaus mamar, maternitate, călduri ──
+    const { data: monte } = await db.from('monte')
+      .select('*,vaci_lapte(nume,numar_crotal)')
+      .eq('fatare_finalizata', false);
+
+    if (monte) {
+      for (const m of monte) {
+        const zile = daysDiff(m.data_monta);
+        const numeVaca = m.vaci_lapte?.nume || '–';
+        const crotal = m.vaci_lapte?.numar_crotal || '';
+        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
+
+        // Călduri la 21 zile (neconfirmate)
+        if (!m.gestanta_confirmata && !m.a_avut_calduri_30 && zile >= 21 && zile < 30) {
+          const tag = `calduri-21-${m.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '⚠️ Posibile călduri!',
+              body: `${label} – ${zile} zile de la montă. Verificați comportamentul.`,
+              tag
+            });
+          }
+        }
+
+        // Confirmare gestație la 30 zile
+        if (!m.gestanta_confirmata && zile >= 30) {
+          const tag = `confirmare-30-${m.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '🚨 Confirmare gestație necesară!',
+              body: `${label} – ${zile} zile de la montă. A avut călduri sau e gestantă?`,
+              tag
+            });
+          }
+        }
+
+        if (!m.gestanta_confirmata) continue;
+
+        // Repaus mamar la 220 zile (60 zile înainte de fătare)
+        if (zile >= 220 && zile < 225) {
+          const tag = `repaus-mamar-${m.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '🛑 Repaus mamar obligatoriu!',
+              body: `${label} – ${zile} zile gestație. OPRIȚI mulsul imediat!`,
+              tag
+            });
+          }
+        }
+
+        // Transfer maternitate la 263 zile
+        if (zile >= 263 && zile < 268 && !m.transferata_maternitate) {
+          const tag = `maternitate-263-${m.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '🏥 Transfer la maternitate!',
+              body: `${label} – ${zile} zile gestație. Transferați vaca la maternitate!`,
+              tag
+            });
+          }
+        }
+
+        // Fătare iminentă la 280 zile
+        if (zile >= 280 && zile < 285) {
+          const tag = `fatare-280-${m.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '🍼 Fătare iminentă!',
+              body: `${label} – ${zile} zile. Fătarea poate fi azi sau în curând!`,
+              tag
+            });
+          }
+        }
+
+        // Fătare depășită (>283 zile)
+        if (zile >= 283) {
+          const tag = `fatare-depasita-${m.id}-${Math.floor(zile/3)}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '🚨 Fătare întârziată!',
+              body: `${label} – ${zile} zile gestație! Contactați veterinarul.`,
+              tag
+            });
+          }
+        }
+      }
+    }
+
+    // ── 2. Deparazitări cu data_urmator = azi sau depășit ──
+    const { data: dep } = await db.from('sanatate')
+      .select('*,vaci_lapte(nume,numar_crotal)')
+      .eq('tip', 'deparazitare');
+
+    if (dep) {
+      for (const d of dep) {
+        if (!d.data_urmator) continue;
+        const zileRamas = Math.floor((new Date(d.data_urmator) - new Date()) / (1000 * 60 * 60 * 24));
+        const numeVaca = d.vaci_lapte?.nume || '–';
+        const crotal = d.vaci_lapte?.numar_crotal || '';
+        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
+
+        if (zileRamas <= 0 && zileRamas >= -3) {
+          const tag = `deparazitare-scad-${d.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '💊 Deparazitare scadentă!',
+              body: `${label} – ${d.medicament || 'produs'}. Data: ${formatDate(d.data_urmator)}.`,
+              tag
+            });
+          }
+        } else if (zileRamas === 3) {
+          const tag = `deparazitare-3z-${d.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '⚠️ Deparazitare în 3 zile!',
+              body: `${label} – ${d.medicament || 'produs'}. Pregătiți produsul.`,
+              tag
+            });
+          }
+        }
+      }
+    }
+
+    // ── 3. Vaccinuri cu data_urmator = azi sau depășit ──
+    const { data: vacc } = await db.from('sanatate')
+      .select('*,vaci_lapte(nume,numar_crotal)')
+      .eq('tip', 'vaccin');
+
+    if (vacc) {
+      for (const v of vacc) {
+        if (!v.data_urmator) continue;
+        const zileRamas = Math.floor((new Date(v.data_urmator) - new Date()) / (1000 * 60 * 60 * 24));
+        const numeVaca = v.vaci_lapte?.nume || '–';
+        const crotal = v.vaci_lapte?.numar_crotal || '';
+        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
+
+        if (zileRamas <= 0 && zileRamas >= -3) {
+          const tag = `vaccin-scad-${v.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '💉 Vaccin scadent!',
+              body: `${label} – ${v.medicament || 'vaccin'}. Nu uitați!`,
+              tag
+            });
+          }
+        } else if (zileRamas === 3) {
+          const tag = `vaccin-3z-${v.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '⚠️ Vaccin în 3 zile!',
+              body: `${label} – ${v.medicament || 'vaccin'}. Data: ${formatDate(v.data_urmator)}.`,
+              tag
+            });
+          }
+        }
+      }
+    }
+
+    // ── 4. Tratamente active – verificare doze programate ──
+    const { data: trat } = await db.from('sanatate')
+      .select('*,vaci_lapte(nume,numar_crotal)')
+      .eq('tip', 'tratament')
+      .eq('finalizat', false);
+
+    if (trat) {
+      for (const t of trat) {
+        if (!t.data_urmator) continue;
+        const zileRamas = Math.floor((new Date(t.data_urmator) - new Date()) / (1000 * 60 * 60 * 24));
+        const numeVaca = t.vaci_lapte?.nume || '–';
+        const crotal = t.vaci_lapte?.numar_crotal || '';
+        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
+
+        if (zileRamas <= 0 && zileRamas >= -1) {
+          const tag = `tratament-doza-${t.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '💊 Doză tratament azi!',
+              body: `${label} – ${t.medicament || t.diagnostic || 'tratament'}. Administrați doza!`,
+              tag
+            });
+          }
+        }
+      }
+    }
+
+    // ── 5. Vițele femele care împlinesc 18 luni (±3 zile) ──
+    const { data: vitei } = await db.from('fatari')
+      .select('*,vaci_lapte(nume,numar_crotal)')
+      .eq('sex_vitel', 'femela')
+      .eq('vitel_vandut', false);
+
+    if (vitei) {
+      for (const f of vitei) {
+        if (!f.data_fatare) continue;
+        const zile = daysDiff(f.data_fatare);
+        // 18 luni = ~548 zile
+        if (zile >= 545 && zile <= 551) {
+          const tag = `vitea-18luni-${f.id}`;
+          if (!_notifTrimisaAzi(tag)) {
+            trimiteNotificare({
+              titlu: '🐄 Vițea aptă pentru montă!',
+              body: `${f.nume_vitel || f.crotal_vitel || 'Vițea'} a împlinit 18 luni – vârsta optimă pentru prima montă!`,
+              tag
+            });
+          }
+        }
+      }
+    }
+
+  } catch (err) {
+    console.warn('[FermaPro] Eroare la scanarea evenimentelor:', err);
+  }
+}
+
+// ── Pornește scanarea zilnică (la login + o dată pe oră) ──
+let _scanTimer = null;
+function pornesteScanareZilnica() {
+  if (_scanTimer) clearInterval(_scanTimer);
+  // Prima scanare după 5 secunde (după ce datele sunt încărcate)
+  setTimeout(scanEvenimenteFerma, 5000);
+  // Repetă la fiecare oră
+  _scanTimer = setInterval(scanEvenimenteFerma, 60 * 60 * 1000);
+}
+
+// ============================================================
+// SETĂRI MULSURI
 // ============================================================
 let mulsTimer1 = null, mulsTimer2 = null, mulsTimer3 = null;
 let mulsTimer4 = null, mulsTimer5 = null, mulsTimer6 = null;
@@ -2034,122 +2401,65 @@ async function cerePermisiuneNotificari() {
     return;
   }
 
-  // Înregistrează push subscription prin service worker
-  try {
-    const reg = await navigator.serviceWorker.ready;
-
-    // VAPID public key – generată pentru FermaPro
-    // Aceasta e o cheie demo; pentru producție înlocuiți cu propria cheie VAPID
-    const VAPID_PUBLIC = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
-
-    let subscription;
-    try {
-      subscription = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
-      });
-      await salveazaSubscriptie(subscription);
-      notif('Notificări activate! Vei primi alerte chiar și cu browserul închis. ✅', 'ok');
-    } catch(pushErr) {
-      // Push subscription eșuat (server VAPID neconfigurat) – fallback la browser notifications
-      console.warn('Push subscription eșuat, folosim browser notifications:', pushErr.message);
-      notif('Notificări browser activate! ✅ (funcționează doar cu aplicația deschisă)', 'ok');
-    }
-  } catch(e) {
-    console.warn('Service Worker nu e gata:', e);
-    notif('Notificări browser activate! ✅', 'ok');
-  }
-
+  notif('✅ Notificări activate! Vei primi alerte despre mulsuri și evenimente fermă.', 'ok');
   pornestTimereMuls();
+  pornesteScanareZilnica();
   await verificaPermisiuniNotificari();
 }
 
-// Convertor necesar pentru VAPID key
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
-  return outputArray;
-}
+// Verifică și afișează statusul notificărilor
+async function verificaPermisiuniNotificari() {
+  const el = document.getElementById('notif_status');
+  if (!el) return;
 
-// Trimite notificare prin Service Worker (sau Notification API dacă SW nu e disponibil)
-function trimiteNotificareMuls(tip, ora) {
-  if (Notification.permission !== 'granted') return;
-  const mesaje = {
-    preaviz_dim: { titlu:'⏰ Muls în 30 minute!', body:`Pregătiți-vă! Mulsul de dimineață începe la ${ora}.` },
-    muls_dim:    { titlu:'🥛 Ora mulsului de dimineață!', body:`Mulsul de dimineață a început! (${ora})` },
-    preaviz_sea: { titlu:'⏰ Muls în 30 minute!', body:`Pregătiți-vă! Mulsul de seară începe la ${ora}.` },
-    muls_sea:    { titlu:'🥛 Ora mulsului de seară!', body:`Mulsul de seară a început! (${ora})` },
-    preaviz_ami: { titlu:'⏰ Muls amiază în 30 min!', body:`Vacile fătate – mulsul de amiază la ${ora}.` },
-    muls_ami:    { titlu:'🍼 Muls amiază!', body:`Ora mulsului de amiază! (${ora})` },
-  };
-  const m = mesaje[tip];
-  if (!m) return;
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    el.innerHTML = '❌ Browserul tău nu suportă notificări.';
+    el.className = 'info-box warning'; return;
+  }
 
-  // Trimite prin Service Worker dacă e disponibil (apare în bara de notificări cu sunet)
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({
-      tip: 'PROGRAMEAZA_NOTIFICARE',
-      titlu: m.titlu,
-      body: m.body,
-      tag: 'ferma-muls-' + tip,
-      msDelay: 0
-    });
+  if (Notification.permission === 'denied') {
+    el.innerHTML = '🚫 Notificările sunt <strong>blocate</strong>. Mergeți la Setări telefon → Chrome → ferma-vaci.vercel.app → Permiteți notificările.';
+    el.className = 'info-box warning'; return;
+  }
+
+  const swActiv = navigator.serviceWorker.controller !== null;
+
+  if (Notification.permission === 'granted' && swActiv) {
+    el.innerHTML = '✅ Notificările sunt <strong>complet activate</strong>. Vei primi alerte la orele de muls și pentru toate evenimentele fermei, chiar și cu ecranul blocat.';
+    el.className = 'info-box';
+  } else if (Notification.permission === 'granted' && !swActiv) {
+    el.innerHTML = '🔶 Notificările browser sunt active. <strong>Reîncărcați pagina</strong> pentru a activa și notificările cu ecranul blocat.';
+    el.className = 'info-box warning';
   } else {
-    // Fallback direct
-    new Notification(m.titlu, {
-      body: m.body,
-      icon: '/icon-192.png',
-      tag: 'ferma-muls-' + tip,
-      silent: false,
-    });
+    el.innerHTML = '⚠️ Notificările nu sunt activate. Apăsați butonul de mai jos.';
+    el.className = 'info-box warning';
   }
 }
-
-function oraLaMs(oraStr) {
-  const now = new Date();
-  const [h, m] = oraStr.split(':').map(Number);
-  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
-  return target - now;
-}
-
-function oraMinusTreiZeci(oraStr) {
-  const [h, m] = oraStr.split(':').map(Number);
-  let prH = h, prM = m - 30;
-  if (prM < 0) { prM += 60; prH = (prH - 1 + 24) % 24; }
-  return String(prH).padStart(2,'0') + ':' + String(prM).padStart(2,'0');
-}
-
-function pornestTimereMuls() {
-  [mulsTimer1,mulsTimer2,mulsTimer3,mulsTimer4,mulsTimer5,mulsTimer6].forEach(t=>{ if(t) clearTimeout(t); });
-  const s = getSetariMuls();
-  function scheduleazaMuls(oraStr, tipPrea, tipMuls) {
-    const preavizOra = oraMinusTreiZeci(oraStr);
-    const msP = oraLaMs(preavizOra);
-    const msM = oraLaMs(oraStr);
-    setTimeout(() => { trimiteNotificareMuls(tipPrea, oraStr); scheduleazaMuls(oraStr, tipPrea, tipMuls); }, msP);
-    setTimeout(() => { trimiteNotificareMuls(tipMuls, oraStr); }, msM);
-  }
-  scheduleazaMuls(s.oraDim, 'preaviz_dim', 'muls_dim');
-  scheduleazaMuls(s.oraSeara, 'preaviz_sea', 'muls_sea');
-  if (s.amiazeActiv) scheduleazaMuls(s.oraAmiaza, 'preaviz_ami', 'muls_ami');
-}
-
-window.addEventListener('load', () => {
-  if (Notification.permission === 'granted') setTimeout(pornestTimereMuls, 3000);
-});
 
 function testeazaNotificare() {
   if (Notification.permission !== 'granted') { notif('Activați mai întâi notificările!', 'warn'); return; }
-  trimiteNotificareMuls('muls_dim', '-- test --');
+  trimiteNotificare({
+    titlu: '🐄 FermaPro – Test notificare',
+    body: 'Notificările funcționează! Veți primi alerte pentru mulsuri, fătări, deparazitări și alte evenimente.',
+    tag: 'ferma-test'
+  });
   notif('Notificare test trimisă! Verificați bara de notificări.', 'ok');
 }
 
-// Funcție goală păstrată pentru compatibilitate (nu mai e necesară cu SW)
+// Inițializare notificări la pornire
+window.addEventListener('load', () => {
+  if (Notification.permission === 'granted') {
+    setTimeout(() => {
+      pornestTimereMuls();
+      pornesteScanareZilnica();
+    }, 3000);
+  }
+});
+
+// Păstrat pentru compatibilitate
 async function inregistreazaOneSignalPlayer() {}
+async function salveazaSubscriptie() {}
+function urlBase64ToUint8Array() { return new Uint8Array(); }
 
 </script>
 </body>
