@@ -6,19 +6,13 @@
 <title>FermaPro – Aplicație Fermă</title>
 <meta name="theme-color" content="#1a2e1a">
 <script>
-// ── Înregistrare Service Worker pentru notificări ──
+// ── Înregistrare Service Worker pentru notificări push ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
       const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       console.log('Service Worker înregistrat:', reg.scope);
       window._swReg = reg;
-      // Ascultă mesaje de la SW (ex: click pe notificare)
-      navigator.serviceWorker.addEventListener('message', e => {
-        if(e.data && e.data.tip === 'NOTIFICARE_CLICK') {
-          showPage('alerte', document.querySelector('.nav-item'));
-        }
-      });
     } catch(e) {
       console.warn('Service Worker eroare:', e);
     }
@@ -418,31 +412,16 @@ tr:hover td{background:rgba(74,140,63,0.03);}
           </div>
           <!-- Card notificări -->
           <div class="card" style="grid-column:1/-1">
-            <div class="card-header"><div class="card-title">🔔 Notificări Fermă – Sistem Unificat</div></div>
+            <div class="card-header"><div class="card-title">🔔 Notificări Browser</div></div>
             <div class="card-body">
               <div id="notif_status" class="info-box" style="margin-bottom:14px">Verificare permisiuni notificări...</div>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <button class="btn btn-primary" onclick="cerePermisiuneNotificari()">🔔 Activează notificările</button>
+                <button class="btn btn-primary" onclick="cerePermisiuneNotificari()">🔔 Activează notificări browser</button>
                 <button class="btn btn-secondary" onclick="testeazaNotificare()">🧪 Testează notificare</button>
-                <button class="btn btn-secondary" onclick="scanEvenimenteFerma().then(()=>notif('Scanare manuală completă ✅','ok'))">🔍 Scanare manuală</button>
               </div>
-              <div style="margin-top:16px;background:var(--cream);border-radius:8px;padding:14px;border:1px solid var(--border)">
-                <div style="font-size:0.82rem;font-weight:700;color:var(--text-dark);margin-bottom:10px">📋 Ce evenimente declanșează notificări:</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.8rem;color:var(--text-mid)">
-                  <div>🥛 <strong>Mulsuri</strong> – la ora exactă + preaviz 30 min (dimineață, seară, amiază)</div>
-                  <div>⚠️ <strong>Călduri la 21 zile</strong> – verificare comportament după montă</div>
-                  <div>🚨 <strong>Confirmare gestație la 30 zile</strong> – confirmare obligatorie</div>
-                  <div>🛑 <strong>Repaus mamar la 220 zile</strong> – oprire muls (60 zile înainte de fătare)</div>
-                  <div>🏥 <strong>Transfer maternitate la 263 zile</strong> – pregătire pentru fătare</div>
-                  <div>🍼 <strong>Fătare iminentă la 280 zile</strong> – alertă urgentă</div>
-                  <div>💊 <strong>Deparazitări scadente</strong> – cu 3 zile înainte și în ziua scadenței</div>
-                  <div>💉 <strong>Vaccinuri scadente</strong> – cu 3 zile înainte și în ziua scadenței</div>
-                  <div>💊 <strong>Doze tratamente</strong> – în ziua administrării programate</div>
-                  <div>🐄 <strong>Vițele 18 luni</strong> – vârsta optimă pentru prima montă</div>
-                </div>
-                <div style="margin-top:10px;font-size:0.78rem;color:var(--text-light)">
-                  ℹ️ Scanarea evenimentelor se face automat la fiecare oră. Notificările apar în bara de notificări a telefonului chiar și cu ecranul blocat (necesită acceptarea permisiunilor + PWA instalată pe Android Chrome).
-                </div>
+              <div style="margin-top:16px;font-size:0.82rem;color:var(--text-mid)">
+                <strong>Cum funcționează:</strong> La ora mulsului (și cu 30 min înainte) browserul va afișa o notificare. 
+                <span style="color:var(--amber)">⚠️ Aplicația trebuie să fie deschisă în browser (sau ca PWA instalată) pentru ca notificările să funcționeze.</span>
               </div>
             </div>
           </div>
@@ -893,13 +872,8 @@ function startApp(email) {
   document.getElementById('userName').textContent = email.split('@')[0];
   document.getElementById('userRole').textContent = 'Utilizator fermă';
   initApp();
-  // Pornește notificările dacă sunt deja acceptate
-  if (Notification.permission === 'granted') {
-    setTimeout(() => {
-      pornestTimereMuls();
-      pornesteScanareZilnica();
-    }, 4000);
-  }
+  // Înregistrăm player ID OneSignal după login
+  setTimeout(inregistreazaOneSignalPlayer, 2000);
 }
 
 async function doLogout() {
@@ -986,7 +960,7 @@ async function loadDashboard() {
   document.getElementById('navAlertCount').textContent = alerte.length;
   const daEl = document.getElementById('dashAlerte');
   if(alerte.length===0){ daEl.innerHTML='<div class="loading">✅ Nu există alerte active</div>'; }
-  else { daEl.innerHTML = alerte.slice(0,6).map(a=>`<div class="alert-item"><div class="alert-dot ${a.nivel}"></div><div><div class="alert-text"><strong>${a.vaca}</strong>: ${a.mesaj}</div><div class="alert-sub">${a.sub||''} ${a.actiune?`<span class="alert-action" onclick="${a.actiune}">→ Acțiune</span>`:''}</div></div></div>`).join(''); }
+  else { daEl.innerHTML = alerte.slice(0,6).map(a=>`<div class="alert-item"><div class="alert-dot ${a.nivel}"></div><div style="flex:1;min-width:0"><div class="alert-text"><strong>${a.vaca}</strong>: ${a.icon||''} ${a.mesaj}</div><div class="alert-sub">${a.sub||''} ${a.actiune?`<span class="alert-action" onclick="${a.actiune}">→ Acțiune</span>`:''}</div></div></div>`).join('') + (alerte.length>6?`<div style="text-align:center;padding:8px 0;font-size:0.8rem;border-top:1px solid var(--border)"><span class="alert-action" onclick="showPage('alerte',document.querySelector('[onclick*=alerte]'))">+ ${alerte.length-6} alerte suplimentare →</span></div>`:''); }
   const dim = mulsAzi&&mulsAzi.find(m=>m.moment==='dimineata');
   const sea = mulsAzi&&mulsAzi.find(m=>m.moment==='seara');
   document.getElementById('dashMuls').innerHTML = `
@@ -1009,38 +983,253 @@ async function loadDashboard() {
 
 async function calcAlerte() {
   const alerte = [];
-  const { data: monte } = await db.from('monte').select('*,vaci_lapte(nume,numar_crotal)').eq('fatare_finalizata',false);
+
+  // ── 1. MONTE ACTIVE: călduri, confirmare, repaus mamar, maternitate, fătare ──
+  const { data: monte } = await db.from('monte').select('*,vaci_lapte(nume,numar_crotal,data_nastere,an_nastere)').eq('fatare_finalizata',false);
   if(monte) {
     for(const m of monte) {
       const zile = daysDiff(m.data_monta);
       const numeVaca = m.vaci_lapte?.nume||'–';
       const crotal = m.vaci_lapte?.numar_crotal||'';
-      const idLabel = `${crotal} – ${numeVaca}`;
-      const fatEst = formatDate(addDays(m.data_monta,283));
+      const idLabel = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
+      const fatEst = formatDate(addDays(m.data_monta, 283));
+      const zileleFataEstimate = Math.max(0, 283 - zile);
+
+      // Călduri posibile la 21 zile (neconfirmate)
       if(!m.gestanta_confirmata && m.a_avut_calduri_30===null) {
-        if(zile>=30)
-          alerte.push({nivel:'red',vaca:idLabel,mesaj:`🚨 CONFIRMARE OBLIGATORIE – ${zile} zile de la montă`,sub:'A avut călduri? Confirmați acum!',actiune:`deschideCalduri('${m.id}','${numeVaca}')`});
-        else if(zile>=21)
-          alerte.push({nivel:'amber',vaca:idLabel,mesaj:`⚠️ Posibile călduri – ${zile} zile de la montă`,sub:'Monitorizați comportamentul – confirmare la 30 zile'});
+        if(zile >= 30)
+          alerte.push({
+            nivel:'red', categorie:'reproductie', icon:'🚨',
+            vaca:idLabel, mesaj:`CONFIRMARE OBLIGATORIE – ${zile} zile de la montă`,
+            sub:'A avut călduri? Confirmați gestația acum!',
+            actiune:`deschideCalduri('${m.id}','${numeVaca}')`
+          });
+        else if(zile >= 21)
+          alerte.push({
+            nivel:'amber', categorie:'reproductie', icon:'⚠️',
+            vaca:idLabel, mesaj:`Posibile călduri – ${zile} zile de la montă`,
+            sub:'Monitorizați comportamentul – confirmare la 30 zile'
+          });
       }
+
       if(!m.gestanta_confirmata) continue;
-      if(zile>=205&&zile<220)
-        alerte.push({nivel:'amber',vaca:idLabel,mesaj:`📅 ${zile} zile gestație – Pregătiți reducerea mulsului`,sub:'Repausul mamar total obligatoriu la 220 zile'});
-      if(zile>=220&&zile<260)
-        alerte.push({nivel:'red',vaca:idLabel,mesaj:`🛑 ${zile} zile gestație – REPAUS MAMAR OBLIGATORIU`,sub:'Vaca NU mai trebuie mulsă!'});
-      if(zile>=260&&zile<280&&!m.transferata_maternitate)
-        alerte.push({nivel:'red',vaca:idLabel,mesaj:`🏥 ${zile} zile – Transfer la maternitate!`,sub:`Fătare estimată: ${fatEst}`});
-      if(zile>=280)
-        alerte.push({nivel:'red',vaca:idLabel,mesaj:`🍼 ${zile} zile – FĂTARE IMINENTĂ!`,sub:`Fătare estimată: ${fatEst}`});
+
+      // Pregătire repaus mamar (205–219 zile)
+      if(zile >= 205 && zile < 220)
+        alerte.push({
+          nivel:'amber', categorie:'reproductie', icon:'📅',
+          vaca:idLabel, mesaj:`${zile} zile gestație – Reduceți mulsul progresiv`,
+          sub:`Repaus mamar total obligatoriu la 220 zile · Fătare estimată: ${fatEst}`
+        });
+
+      // Repaus mamar activ (220–262 zile)
+      if(zile >= 220 && zile < 263)
+        alerte.push({
+          nivel:'red', categorie:'reproductie', icon:'🛑',
+          vaca:idLabel, mesaj:`${zile} zile gestație – REPAUS MAMAR OBLIGATORIU`,
+          sub:`Vaca NU mai trebuie mulsă! · Fătare estimată: ${fatEst}`
+        });
+
+      // Transfer la maternitate (263–279 zile)
+      if(zile >= 263 && zile < 280 && !m.transferata_maternitate)
+        alerte.push({
+          nivel:'red', categorie:'reproductie', icon:'🏥',
+          vaca:idLabel, mesaj:`${zile} zile – Transfer la maternitate!`,
+          sub:`Mai sunt ~${zileleFataEstimate} zile până la fătare · ${fatEst}`
+        });
+
+      // Fătare iminentă (280–282 zile)
+      if(zile >= 280 && zile < 283)
+        alerte.push({
+          nivel:'red', categorie:'reproductie', icon:'🍼',
+          vaca:idLabel, mesaj:`${zile} zile – FĂTARE IMINENTĂ!`,
+          sub:`Fătare estimată: ${fatEst} · Monitorizare permanentă!`,
+          actiune:`openFatare('${m.id}','${m.vaca_id}')`
+        });
+
+      // Fătare depășită (≥283 zile)
+      if(zile >= 283)
+        alerte.push({
+          nivel:'red', categorie:'reproductie', icon:'🚨',
+          vaca:idLabel, mesaj:`${zile} zile – FĂTARE DEPĂȘITĂ! (+${zile-283} zile)`,
+          sub:`Fătare estimată era: ${fatEst} · Contactați veterinarul!`,
+          actiune:`openFatare('${m.id}','${m.vaca_id}')`
+        });
     }
   }
-  const { data: vaci7 } = await db.from('vaci_lapte').select('*').eq('activ',true);
-  if(vaci7) for(const v of vaci7) {
-    const aniV = v.data_nastere ? Math.floor(daysDiff(v.data_nastere)/365) : getAge(v.an_nastere||2020);
-    if(aniV>=7) alerte.push({nivel:'amber',vaca:`${v.numar_crotal||''} – ${v.nume}`,mesaj:`${aniV} ani – Evaluați vânzarea/reforma`,sub:'Vaci peste 7 ani produc mai puțin'});
+
+  // ── 2. MULSURI AZI: verificare dacă sunt înregistrate ──
+  const { data: mulsAzi } = await db.from('mulsuri').select('*').eq('data', today());
+  const s = getSetariMuls();
+  const nowH = new Date().getHours();
+  const [dimH] = s.oraDim.split(':').map(Number);
+  const [seaH] = s.oraSeara.split(':').map(Number);
+  const [amiH] = s.oraAmiaza ? s.oraAmiaza.split(':').map(Number) : [12];
+
+  const areaDim = mulsAzi && mulsAzi.find(m => m.moment === 'dimineata');
+  const areaSea = mulsAzi && mulsAzi.find(m => m.moment === 'seara');
+  const areaAmi = mulsAzi && mulsAzi.find(m => m.moment === 'amiaza');
+
+  // Muls dimineață neînregistrat (după ora programată + 30 min de grație)
+  if(!areaDim && nowH >= dimH + 1)
+    alerte.push({
+      nivel: nowH >= dimH + 3 ? 'red' : 'amber',
+      categorie:'muls', icon:'🥛',
+      vaca:'Muls dimineață', mesaj:`Mulsul de dimineață (${s.oraDim}) nu a fost înregistrat`,
+      sub:`Apăsați pe slot-ul de muls din Dashboard pentru a înregistra`,
+      actiune:`openModalMuls('dimineata')`
+    });
+
+  // Muls seară neînregistrat (după ora programată + 30 min de grație)
+  if(!areaSea && nowH >= seaH + 1)
+    alerte.push({
+      nivel: nowH >= seaH + 3 ? 'red' : 'amber',
+      categorie:'muls', icon:'🥛',
+      vaca:'Muls seară', mesaj:`Mulsul de seară (${s.oraSeara}) nu a fost înregistrat`,
+      sub:`Înregistrați mulsul de seară`,
+      actiune:`openModalMuls('seara')`
+    });
+
+  // Muls amiază neînregistrat (dacă e activ)
+  const amiazeActiv = localStorage.getItem('muls_amiaza_activ') !== 'false';
+  if(amiazeActiv && !areaAmi && nowH >= amiH + 1)
+    alerte.push({
+      nivel:'amber', categorie:'muls', icon:'🍼',
+      vaca:'Muls amiază', mesaj:`Mulsul de amiază (${s.oraAmiaza}) nu a fost înregistrat`,
+      sub:`Mulsul de amiază pentru vacile post-fătare`,
+      actiune:`openModalMuls('amiaza')`
+    });
+
+  // Aparat necurățat
+  const mulsNecurat = mulsAzi && mulsAzi.find(m => !m.curatat_aparat);
+  if(mulsNecurat)
+    alerte.push({
+      nivel:'amber', categorie:'muls', icon:'⚠️',
+      vaca:'Igienă aparat muls', mesaj:`Aparatul de muls nu a fost curățat la mulsul de ${mulsNecurat.moment}`,
+      sub:'Igienizarea previne mastita și contaminarea laptelui!'
+    });
+
+  // ── 3. SĂNĂTATE: deparazitări, vaccinuri, tratamente ──
+  const { data: sanatate } = await db.from('sanatate').select('*,vaci_lapte(nume,numar_crotal)');
+  if(sanatate) {
+    for(const rec of sanatate) {
+      const numeV = rec.vaci_lapte?.nume || '–';
+      const crotalV = rec.vaci_lapte?.numar_crotal || '';
+      const label = crotalV ? `${crotalV} – ${numeV}` : numeV;
+
+      if(rec.tip === 'deparazitare' && rec.data_urmator) {
+        const zileR = Math.floor((new Date(rec.data_urmator) - new Date()) / 86400000);
+        if(zileR < 0)
+          alerte.push({
+            nivel:'red', categorie:'sanatate', icon:'💊',
+            vaca:label, mesaj:`Deparazitare DEPĂȘITĂ cu ${Math.abs(zileR)} zile`,
+            sub:`Produs: ${rec.medicament||'–'} · Scadent: ${formatDate(rec.data_urmator)}`,
+            actiune:`openEditareSan(${rec.id})`
+          });
+        else if(zileR <= 7)
+          alerte.push({
+            nivel: zileR <= 3 ? 'red' : 'amber', categorie:'sanatate', icon:'💊',
+            vaca:label, mesaj:`Deparazitare în ${zileR === 0 ? 'AZI' : zileR + ' zile'}`,
+            sub:`Produs: ${rec.medicament||'–'} · Data: ${formatDate(rec.data_urmator)}`,
+            actiune:`openEditareSan(${rec.id})`
+          });
+      }
+
+      if(rec.tip === 'vaccin' && rec.data_urmator) {
+        const zileR = Math.floor((new Date(rec.data_urmator) - new Date()) / 86400000);
+        if(zileR < 0)
+          alerte.push({
+            nivel:'red', categorie:'sanatate', icon:'💉',
+            vaca:label, mesaj:`Vaccin DEPĂȘIT cu ${Math.abs(zileR)} zile`,
+            sub:`Vaccin: ${rec.medicament||'–'} · Scadent: ${formatDate(rec.data_urmator)}`,
+            actiune:`openEditareSan(${rec.id})`
+          });
+        else if(zileR <= 7)
+          alerte.push({
+            nivel: zileR <= 3 ? 'red' : 'amber', categorie:'sanatate', icon:'💉',
+            vaca:label, mesaj:`Vaccin scadent în ${zileR === 0 ? 'AZI' : zileR + ' zile'}`,
+            sub:`Vaccin: ${rec.medicament||'–'} · Data: ${formatDate(rec.data_urmator)}`,
+            actiune:`openEditareSan(${rec.id})`
+          });
+      }
+
+      if(rec.tip === 'tratament' && !rec.finalizat && rec.data_urmator) {
+        const zileR = Math.floor((new Date(rec.data_urmator) - new Date()) / 86400000);
+        if(zileR === 0)
+          alerte.push({
+            nivel:'red', categorie:'sanatate', icon:'💊',
+            vaca:label, mesaj:`Doză tratament AZI`,
+            sub:`${rec.diagnostic||''} · ${rec.medicament||''} ${rec.doza ? '· ' + rec.doza : ''}`,
+            actiune:`openEditareSan(${rec.id})`
+          });
+        else if(zileR < 0 && zileR >= -3)
+          alerte.push({
+            nivel:'amber', categorie:'sanatate', icon:'💊',
+            vaca:label, mesaj:`Doză tratament depășită cu ${Math.abs(zileR)} zile`,
+            sub:`${rec.diagnostic||''} · ${rec.medicament||''}`,
+            actiune:`openEditareSan(${rec.id})`
+          });
+      }
+
+      // Carantină lapte activă
+      if(rec.tip === 'tratament' && !rec.finalizat && rec.carantina_lapte_zile > 0 && rec.data) {
+        const zileTrec = daysDiff(rec.data);
+        const zileRamaseCar = rec.carantina_lapte_zile - zileTrec;
+        if(zileRamaseCar > 0)
+          alerte.push({
+            nivel:'red', categorie:'sanatate', icon:'⛔',
+            vaca:label, mesaj:`Carantină lapte activă – mai ${zileRamaseCar} zile`,
+            sub:`${rec.medicament||''} · Lapte necorespunzător consumului!`
+          });
+      }
+    }
   }
-  const { data: vacc } = await db.from('sanatate').select('*,vaci_lapte(nume,numar_crotal)').eq('tip','vaccin').eq('finalizat',false);
-  if(vacc) for(const v of vacc) if(v.data_urmator&&daysDiff(v.data_urmator)>=0) alerte.push({nivel:'amber',vaca:`${v.vaci_lapte?.numar_crotal||''} – ${v.vaci_lapte?.nume||'–'}`,mesaj:`💉 Vaccin scadent: ${v.medicament}`,sub:`Scadent: ${formatDate(v.data_urmator)}`});
+
+  // ── 4. VACI: vârstă > 7 ani ──
+  const { data: toateVaci } = await db.from('vaci_lapte').select('*').eq('activ',true);
+  if(toateVaci) {
+    for(const v of toateVaci) {
+      const aniV = v.data_nastere ? Math.floor(daysDiff(v.data_nastere)/365) : getAge(v.an_nastere||2020);
+      if(aniV >= 7)
+        alerte.push({
+          nivel:'amber', categorie:'vaci', icon:'🐄',
+          vaca:`${v.numar_crotal||''} – ${v.nume}`,
+          mesaj:`${aniV} ani – Evaluați vânzarea sau reforma`,
+          sub:'Vacile peste 7 ani au producție de lapte în scădere'
+        });
+    }
+  }
+
+  // ── 5. VIȚELE: 18 luni → aptă pentru prima montă ──
+  const { data: vitei } = await db.from('fatari').select('*').eq('sex_vitel','femela').eq('vitel_vandut',false);
+  if(vitei) {
+    for(const f of vitei) {
+      if(!f.data_fatare) continue;
+      const zileVarsta = daysDiff(f.data_fatare);
+      const luniVarsta = Math.floor(zileVarsta / 30);
+      if(zileVarsta >= 540 && zileVarsta < 600)
+        alerte.push({
+          nivel:'amber', categorie:'vitei', icon:'🐄',
+          vaca: f.nume_vitel || f.crotal_vitel || 'Vițea femelă',
+          mesaj:`${luniVarsta} luni – Vârstă optimă pentru prima montă!`,
+          sub:`Născută: ${formatDate(f.data_fatare)} · Prima montă recomandată între 15–18 luni`
+        });
+      else if(zileVarsta >= 600)
+        alerte.push({
+          nivel:'red', categorie:'vitei', icon:'🐄',
+          vaca: f.nume_vitel || f.crotal_vitel || 'Vițea femelă',
+          mesaj:`${luniVarsta} luni – Montă ÎNTÂRZIATĂ`,
+          sub:`Născută: ${formatDate(f.data_fatare)} · Programați monta imediat!`
+        });
+    }
+  }
+
+  // Sortare: urgente primele, apoi în ordine alfabetică vacă
+  alerte.sort((a, b) => {
+    const ord = { red: 0, amber: 1 };
+    return (ord[a.nivel] ?? 2) - (ord[b.nivel] ?? 2);
+  });
+
   return alerte;
 }
 
@@ -1562,15 +1751,104 @@ async function salveazaAvort() {
 }
 
 async function loadAlerte() {
-  const alerte = await calcAlerte();
   const cont = document.getElementById('alerteContainer');
-  if(alerte.length===0){ cont.innerHTML='<div class="card"><div class="card-body" style="text-align:center;padding:32px;color:var(--text-light)">✅ Nu există alerte active</div></div>'; return; }
-  const urgente=alerte.filter(a=>a.nivel==='red');
-  const atentie=alerte.filter(a=>a.nivel==='amber');
-  let html='';
-  if(urgente.length) html+=urgente.map(a=>`<div class="calduri-urgent"><div class="calduri-urgent-title">🚨 ${a.vaca}</div><div style="font-size:0.875rem;color:var(--text-mid);margin-bottom:8px">${a.mesaj}</div><div style="font-size:0.78rem;color:var(--text-mid)">${a.sub||''}</div>${a.actiune?`<div style="margin-top:10px"><button class="btn btn-danger btn-sm" onclick="${a.actiune}">→ Acțiune necesară</button></div>`:''}</div>`).join('');
-  if(atentie.length) html+=atentie.map(a=>`<div class="calduri-warn"><div class="calduri-warn-title">⚠️ ${a.vaca}</div><div style="font-size:0.875rem;color:var(--text-mid)">${a.mesaj}</div><div style="font-size:0.78rem;color:var(--text-mid);margin-top:4px">${a.sub||''}</div></div>`).join('');
+  cont.innerHTML = '<div class="loading">Se încarcă alertele...</div>';
+  const alerte = await calcAlerte();
+
+  if(alerte.length === 0) {
+    cont.innerHTML = `<div class="card"><div class="card-body" style="text-align:center;padding:40px;color:var(--text-light)">
+      <div style="font-size:3rem;margin-bottom:12px">✅</div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--green-mid)">Nu există alerte active</div>
+      <div style="font-size:0.84rem;margin-top:6px">Toate evenimentele sunt la zi. Reveniți mâine.</div>
+    </div></div>`;
+    return;
+  }
+
+  const urgente = alerte.filter(a => a.nivel === 'red');
+  const atentie = alerte.filter(a => a.nivel === 'amber');
+  const catLabel = { reproductie:'🔄 Reproducție', muls:'🥛 Mulsuri', sanatate:'💊 Sănătate', vaci:'🐄 Vaci', vitei:'🐂 Viței' };
+
+  // Grupare pe categorii pentru filtre
+  const categorii = [...new Set(alerte.map(a => a.categorie))];
+
+  // Header cu sumarul și butoane de filtrare
+  let html = `
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <div style="font-size:0.82rem;color:var(--text-mid)">
+      <span style="background:var(--red);color:white;border-radius:20px;padding:3px 10px;font-weight:700;font-size:0.78rem">${urgente.length} urgente</span>
+      &nbsp;
+      <span style="background:var(--amber);color:white;border-radius:20px;padding:3px 10px;font-weight:700;font-size:0.78rem">${atentie.length} atenție</span>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="filtreCat">
+      <button class="btn btn-sm btn-primary" style="font-size:0.72rem" onclick="filtreazaAlerte('toate')">Toate (${alerte.length})</button>
+      ${categorii.map(c=>`<button class="btn btn-sm btn-secondary" style="font-size:0.72rem" onclick="filtreazaAlerte('${c}')">${catLabel[c]||c} (${alerte.filter(a=>a.categorie===c).length})</button>`).join('')}
+    </div>
+  </div>
+  <div id="listaAlerte">`;
+
+  // Urgente
+  if(urgente.length) {
+    html += `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin:0 0 8px;opacity:0.8">🚨 URGENTE – Necesită acțiune imediată</div>`;
+    html += urgente.map(a => cardAlerta(a)).join('');
+  }
+
+  // Atenție
+  if(atentie.length) {
+    html += `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin:${urgente.length?'18px':0} 0 8px;opacity:0.8">⚠️ ATENȚIE – Monitorizare necesară</div>`;
+    html += atentie.map(a => cardAlerta(a)).join('');
+  }
+
+  html += `</div>`;
   cont.innerHTML = html;
+
+  // Stochează alertele pentru filtrare
+  window._alerteCache = alerte;
+}
+
+function cardAlerta(a) {
+  const isRed = a.nivel === 'red';
+  const bg = isRed
+    ? 'background:linear-gradient(135deg,#fce4ec,#ffebee);border:2px solid var(--red)'
+    : 'background:linear-gradient(135deg,#fff8e1,#fff3cd);border:2px solid var(--amber)';
+  const titleColor = isRed ? 'color:var(--red)' : 'color:var(--amber)';
+  const catLabel = { reproductie:'🔄 Reproducție', muls:'🥛 Mulsuri', sanatate:'💊 Sănătate', vaci:'🐄 Vaci', vitei:'🐂 Viței' };
+  const catBadge = `<span style="font-size:0.65rem;background:rgba(0,0,0,0.07);border-radius:10px;padding:2px 7px;margin-left:6px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.5px">${catLabel[a.categorie]||a.categorie}</span>`;
+  return `<div class="alerta-card" data-cat="${a.categorie}" style="${bg};border-radius:10px;padding:14px 16px;margin-bottom:10px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;${titleColor};font-size:0.92rem;margin-bottom:3px">
+          ${a.icon || ''} ${a.vaca}${catBadge}
+        </div>
+        <div style="font-size:0.875rem;color:var(--text-dark);margin-bottom:4px">${a.mesaj}</div>
+        ${a.sub ? `<div style="font-size:0.77rem;color:var(--text-mid)">${a.sub}</div>` : ''}
+      </div>
+      ${a.actiune ? `<div style="flex-shrink:0"><button class="btn btn-sm ${isRed?'btn-danger':'btn-amber'}" onclick="${a.actiune}">→ Acțiune</button></div>` : ''}
+    </div>
+  </div>`;
+}
+
+function filtreazaAlerte(cat) {
+  const alerte = window._alerteCache || [];
+  const lista = document.getElementById('listaAlerte');
+  if(!lista) return;
+
+  // Actualizează butonul activ
+  document.querySelectorAll('#filtreCat .btn').forEach(b => {
+    b.className = 'btn btn-sm btn-secondary';
+    b.style.fontSize = '0.72rem';
+  });
+  event.target.className = 'btn btn-sm btn-primary';
+  event.target.style.fontSize = '0.72rem';
+
+  const cards = lista.querySelectorAll('.alerta-card');
+  cards.forEach(c => {
+    c.style.display = (cat === 'toate' || c.dataset.cat === cat) ? 'block' : 'none';
+  });
+
+  // Ascunde/afișează labelurile de secțiune (urgente/atenție)
+  lista.querySelectorAll('div[style*="IBM Plex Mono"]').forEach(label => {
+    label.style.display = 'block';
+  });
 }
 
 async function openFisa(v) {
@@ -1856,348 +2134,7 @@ async function readucVacaInFerma(id) {
 }
 
 // ============================================================
-// SISTEM NOTIFICĂRI UNIFICAT – Service Worker Local
-// Funcționează cu ecranul blocat pe Android Chrome
-// NU necesită server VAPID – notificările sunt programate
-// direct prin SW folosind setTimeout în background
-// ============================================================
-
-// ── Utilitar: trimite notificare prin SW (sau fallback direct) ──
-function trimiteNotificare({ titlu, body, tag, icon }) {
-  if (Notification.permission !== 'granted') return;
-  icon = icon || '/icon-192.png';
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({
-      tip: 'ARATA_NOTIFICARE',
-      titlu, body, tag, icon
-    });
-  } else {
-    new Notification(titlu, { body, tag, icon, silent: false });
-  }
-}
-
-// ── Programează o notificare peste X milisecunde ──
-function programeazaNotificare({ titlu, body, tag, icon, msDelay }) {
-  if (Notification.permission !== 'granted') return;
-  if (msDelay <= 0) { trimiteNotificare({ titlu, body, tag, icon }); return; }
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({
-      tip: 'PROGRAMEAZA_NOTIFICARE',
-      titlu, body, tag, icon, msDelay
-    });
-  } else {
-    setTimeout(() => trimiteNotificare({ titlu, body, tag, icon }), msDelay);
-  }
-}
-
-// ── Calculează milisecundele până la o oră (HH:MM) azi sau mâine ──
-function msUntilTime(oraStr) {
-  const now = new Date();
-  const [h, m] = oraStr.split(':').map(Number);
-  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
-  return target - now;
-}
-
-function oraMinusTreiZeci(oraStr) {
-  const [h, m] = oraStr.split(':').map(Number);
-  let prH = h, prM = m - 30;
-  if (prM < 0) { prM += 60; prH = (prH - 1 + 24) % 24; }
-  return String(prH).padStart(2, '0') + ':' + String(prM).padStart(2, '0');
-}
-
-// ============================================================
-// NOTIFICĂRI MULSURI (zilnice, se reprogramează automat)
-// ============================================================
-let _mulsTimers = [];
-
-function pornestTimereMuls() {
-  _mulsTimers.forEach(t => clearTimeout(t));
-  _mulsTimers = [];
-  if (Notification.permission !== 'granted') return;
-
-  const s = getSetariMuls();
-
-  function scheduleazaMuls(oraStr, labelMoment) {
-    const preavizOra = oraMinusTreiZeci(oraStr);
-    const msP = msUntilTime(preavizOra);
-    const msM = msUntilTime(oraStr);
-
-    const t1 = setTimeout(() => {
-      trimiteNotificare({
-        titlu: '⏰ Muls în 30 minute!',
-        body: `Pregătiți-vă! Mulsul de ${labelMoment} începe la ${oraStr}.`,
-        tag: 'ferma-muls-preaviz-' + labelMoment
-      });
-      // Reprogramează pentru ziua viitoare
-      const t3 = setTimeout(() => scheduleazaMuls(oraStr, labelMoment), 23.5 * 3600 * 1000);
-      _mulsTimers.push(t3);
-    }, msP);
-
-    const t2 = setTimeout(() => {
-      trimiteNotificare({
-        titlu: '🥛 Ora mulsului de ' + labelMoment + '!',
-        body: `Mulsul de ${labelMoment} a început! (${oraStr})`,
-        tag: 'ferma-muls-' + labelMoment
-      });
-    }, msM);
-
-    _mulsTimers.push(t1, t2);
-  }
-
-  scheduleazaMuls(s.oraDim, 'dimineață');
-  scheduleazaMuls(s.oraSeara, 'seară');
-  if (s.amiazeActiv) scheduleazaMuls(s.oraAmiaza, 'amiază');
-}
-
-// ============================================================
-// NOTIFICĂRI EVENIMENTE FERMĂ (scanare zilnică din Supabase)
-// Acoperă: fătări, repaus mamar, maternitate, deparazitări,
-//          tratamente programate, 18 luni vițele
-// ============================================================
-
-// Cheie pentru a nu trimite aceeași notificare de 2 ori în aceeași zi
-function _notifTrimisaAzi(tag) {
-  const azi = new Date().toISOString().split('T')[0];
-  const key = 'notif_trimisa_' + azi + '_' + tag;
-  if (localStorage.getItem(key)) return true;
-  localStorage.setItem(key, '1');
-  return false;
-}
-
-async function scanEvenimenteFerma() {
-  if (Notification.permission !== 'granted') return;
-  if (!currentUser) return;
-
-  console.log('[FermaPro] Scanez evenimente pentru notificări...');
-
-  try {
-    // ── 1. Monte active – fătare, repaus mamar, maternitate, călduri ──
-    const { data: monte } = await db.from('monte')
-      .select('*,vaci_lapte(nume,numar_crotal)')
-      .eq('fatare_finalizata', false);
-
-    if (monte) {
-      for (const m of monte) {
-        const zile = daysDiff(m.data_monta);
-        const numeVaca = m.vaci_lapte?.nume || '–';
-        const crotal = m.vaci_lapte?.numar_crotal || '';
-        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
-
-        // Călduri la 21 zile (neconfirmate)
-        if (!m.gestanta_confirmata && !m.a_avut_calduri_30 && zile >= 21 && zile < 30) {
-          const tag = `calduri-21-${m.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '⚠️ Posibile călduri!',
-              body: `${label} – ${zile} zile de la montă. Verificați comportamentul.`,
-              tag
-            });
-          }
-        }
-
-        // Confirmare gestație la 30 zile
-        if (!m.gestanta_confirmata && zile >= 30) {
-          const tag = `confirmare-30-${m.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '🚨 Confirmare gestație necesară!',
-              body: `${label} – ${zile} zile de la montă. A avut călduri sau e gestantă?`,
-              tag
-            });
-          }
-        }
-
-        if (!m.gestanta_confirmata) continue;
-
-        // Repaus mamar la 220 zile (60 zile înainte de fătare)
-        if (zile >= 220 && zile < 225) {
-          const tag = `repaus-mamar-${m.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '🛑 Repaus mamar obligatoriu!',
-              body: `${label} – ${zile} zile gestație. OPRIȚI mulsul imediat!`,
-              tag
-            });
-          }
-        }
-
-        // Transfer maternitate la 263 zile
-        if (zile >= 263 && zile < 268 && !m.transferata_maternitate) {
-          const tag = `maternitate-263-${m.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '🏥 Transfer la maternitate!',
-              body: `${label} – ${zile} zile gestație. Transferați vaca la maternitate!`,
-              tag
-            });
-          }
-        }
-
-        // Fătare iminentă la 280 zile
-        if (zile >= 280 && zile < 285) {
-          const tag = `fatare-280-${m.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '🍼 Fătare iminentă!',
-              body: `${label} – ${zile} zile. Fătarea poate fi azi sau în curând!`,
-              tag
-            });
-          }
-        }
-
-        // Fătare depășită (>283 zile)
-        if (zile >= 283) {
-          const tag = `fatare-depasita-${m.id}-${Math.floor(zile/3)}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '🚨 Fătare întârziată!',
-              body: `${label} – ${zile} zile gestație! Contactați veterinarul.`,
-              tag
-            });
-          }
-        }
-      }
-    }
-
-    // ── 2. Deparazitări cu data_urmator = azi sau depășit ──
-    const { data: dep } = await db.from('sanatate')
-      .select('*,vaci_lapte(nume,numar_crotal)')
-      .eq('tip', 'deparazitare');
-
-    if (dep) {
-      for (const d of dep) {
-        if (!d.data_urmator) continue;
-        const zileRamas = Math.floor((new Date(d.data_urmator) - new Date()) / (1000 * 60 * 60 * 24));
-        const numeVaca = d.vaci_lapte?.nume || '–';
-        const crotal = d.vaci_lapte?.numar_crotal || '';
-        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
-
-        if (zileRamas <= 0 && zileRamas >= -3) {
-          const tag = `deparazitare-scad-${d.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '💊 Deparazitare scadentă!',
-              body: `${label} – ${d.medicament || 'produs'}. Data: ${formatDate(d.data_urmator)}.`,
-              tag
-            });
-          }
-        } else if (zileRamas === 3) {
-          const tag = `deparazitare-3z-${d.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '⚠️ Deparazitare în 3 zile!',
-              body: `${label} – ${d.medicament || 'produs'}. Pregătiți produsul.`,
-              tag
-            });
-          }
-        }
-      }
-    }
-
-    // ── 3. Vaccinuri cu data_urmator = azi sau depășit ──
-    const { data: vacc } = await db.from('sanatate')
-      .select('*,vaci_lapte(nume,numar_crotal)')
-      .eq('tip', 'vaccin');
-
-    if (vacc) {
-      for (const v of vacc) {
-        if (!v.data_urmator) continue;
-        const zileRamas = Math.floor((new Date(v.data_urmator) - new Date()) / (1000 * 60 * 60 * 24));
-        const numeVaca = v.vaci_lapte?.nume || '–';
-        const crotal = v.vaci_lapte?.numar_crotal || '';
-        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
-
-        if (zileRamas <= 0 && zileRamas >= -3) {
-          const tag = `vaccin-scad-${v.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '💉 Vaccin scadent!',
-              body: `${label} – ${v.medicament || 'vaccin'}. Nu uitați!`,
-              tag
-            });
-          }
-        } else if (zileRamas === 3) {
-          const tag = `vaccin-3z-${v.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '⚠️ Vaccin în 3 zile!',
-              body: `${label} – ${v.medicament || 'vaccin'}. Data: ${formatDate(v.data_urmator)}.`,
-              tag
-            });
-          }
-        }
-      }
-    }
-
-    // ── 4. Tratamente active – verificare doze programate ──
-    const { data: trat } = await db.from('sanatate')
-      .select('*,vaci_lapte(nume,numar_crotal)')
-      .eq('tip', 'tratament')
-      .eq('finalizat', false);
-
-    if (trat) {
-      for (const t of trat) {
-        if (!t.data_urmator) continue;
-        const zileRamas = Math.floor((new Date(t.data_urmator) - new Date()) / (1000 * 60 * 60 * 24));
-        const numeVaca = t.vaci_lapte?.nume || '–';
-        const crotal = t.vaci_lapte?.numar_crotal || '';
-        const label = crotal ? `${crotal} – ${numeVaca}` : numeVaca;
-
-        if (zileRamas <= 0 && zileRamas >= -1) {
-          const tag = `tratament-doza-${t.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '💊 Doză tratament azi!',
-              body: `${label} – ${t.medicament || t.diagnostic || 'tratament'}. Administrați doza!`,
-              tag
-            });
-          }
-        }
-      }
-    }
-
-    // ── 5. Vițele femele care împlinesc 18 luni (±3 zile) ──
-    const { data: vitei } = await db.from('fatari')
-      .select('*,vaci_lapte(nume,numar_crotal)')
-      .eq('sex_vitel', 'femela')
-      .eq('vitel_vandut', false);
-
-    if (vitei) {
-      for (const f of vitei) {
-        if (!f.data_fatare) continue;
-        const zile = daysDiff(f.data_fatare);
-        // 18 luni = ~548 zile
-        if (zile >= 545 && zile <= 551) {
-          const tag = `vitea-18luni-${f.id}`;
-          if (!_notifTrimisaAzi(tag)) {
-            trimiteNotificare({
-              titlu: '🐄 Vițea aptă pentru montă!',
-              body: `${f.nume_vitel || f.crotal_vitel || 'Vițea'} a împlinit 18 luni – vârsta optimă pentru prima montă!`,
-              tag
-            });
-          }
-        }
-      }
-    }
-
-  } catch (err) {
-    console.warn('[FermaPro] Eroare la scanarea evenimentelor:', err);
-  }
-}
-
-// ── Pornește scanarea zilnică (la login + o dată pe oră) ──
-let _scanTimer = null;
-function pornesteScanareZilnica() {
-  if (_scanTimer) clearInterval(_scanTimer);
-  // Prima scanare după 5 secunde (după ce datele sunt încărcate)
-  setTimeout(scanEvenimenteFerma, 5000);
-  // Repetă la fiecare oră
-  _scanTimer = setInterval(scanEvenimenteFerma, 60 * 60 * 1000);
-}
-
-// ============================================================
-// SETĂRI MULSURI
+// SETĂRI MULSURI & NOTIFICĂRI BROWSER
 // ============================================================
 let mulsTimer1 = null, mulsTimer2 = null, mulsTimer3 = null;
 let mulsTimer4 = null, mulsTimer5 = null, mulsTimer6 = null;
@@ -2401,65 +2338,122 @@ async function cerePermisiuneNotificari() {
     return;
   }
 
-  notif('✅ Notificări activate! Vei primi alerte despre mulsuri și evenimente fermă.', 'ok');
+  // Înregistrează push subscription prin service worker
+  try {
+    const reg = await navigator.serviceWorker.ready;
+
+    // VAPID public key – generată pentru FermaPro
+    // Aceasta e o cheie demo; pentru producție înlocuiți cu propria cheie VAPID
+    const VAPID_PUBLIC = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+
+    let subscription;
+    try {
+      subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
+      });
+      await salveazaSubscriptie(subscription);
+      notif('Notificări activate! Vei primi alerte chiar și cu browserul închis. ✅', 'ok');
+    } catch(pushErr) {
+      // Push subscription eșuat (server VAPID neconfigurat) – fallback la browser notifications
+      console.warn('Push subscription eșuat, folosim browser notifications:', pushErr.message);
+      notif('Notificări browser activate! ✅ (funcționează doar cu aplicația deschisă)', 'ok');
+    }
+  } catch(e) {
+    console.warn('Service Worker nu e gata:', e);
+    notif('Notificări browser activate! ✅', 'ok');
+  }
+
   pornestTimereMuls();
-  pornesteScanareZilnica();
   await verificaPermisiuniNotificari();
 }
 
-// Verifică și afișează statusul notificărilor
-async function verificaPermisiuniNotificari() {
-  const el = document.getElementById('notif_status');
-  if (!el) return;
+// Convertor necesar pentru VAPID key
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
 
-  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-    el.innerHTML = '❌ Browserul tău nu suportă notificări.';
-    el.className = 'info-box warning'; return;
-  }
+// Trimite notificare prin Service Worker (sau Notification API dacă SW nu e disponibil)
+function trimiteNotificareMuls(tip, ora) {
+  if (Notification.permission !== 'granted') return;
+  const mesaje = {
+    preaviz_dim: { titlu:'⏰ Muls în 30 minute!', body:`Pregătiți-vă! Mulsul de dimineață începe la ${ora}.` },
+    muls_dim:    { titlu:'🥛 Ora mulsului de dimineață!', body:`Mulsul de dimineață a început! (${ora})` },
+    preaviz_sea: { titlu:'⏰ Muls în 30 minute!', body:`Pregătiți-vă! Mulsul de seară începe la ${ora}.` },
+    muls_sea:    { titlu:'🥛 Ora mulsului de seară!', body:`Mulsul de seară a început! (${ora})` },
+    preaviz_ami: { titlu:'⏰ Muls amiază în 30 min!', body:`Vacile fătate – mulsul de amiază la ${ora}.` },
+    muls_ami:    { titlu:'🍼 Muls amiază!', body:`Ora mulsului de amiază! (${ora})` },
+  };
+  const m = mesaje[tip];
+  if (!m) return;
 
-  if (Notification.permission === 'denied') {
-    el.innerHTML = '🚫 Notificările sunt <strong>blocate</strong>. Mergeți la Setări telefon → Chrome → ferma-vaci.vercel.app → Permiteți notificările.';
-    el.className = 'info-box warning'; return;
-  }
-
-  const swActiv = navigator.serviceWorker.controller !== null;
-
-  if (Notification.permission === 'granted' && swActiv) {
-    el.innerHTML = '✅ Notificările sunt <strong>complet activate</strong>. Vei primi alerte la orele de muls și pentru toate evenimentele fermei, chiar și cu ecranul blocat.';
-    el.className = 'info-box';
-  } else if (Notification.permission === 'granted' && !swActiv) {
-    el.innerHTML = '🔶 Notificările browser sunt active. <strong>Reîncărcați pagina</strong> pentru a activa și notificările cu ecranul blocat.';
-    el.className = 'info-box warning';
+  // Trimite prin Service Worker dacă e disponibil (apare în bara de notificări cu sunet)
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      tip: 'PROGRAMEAZA_NOTIFICARE',
+      titlu: m.titlu,
+      body: m.body,
+      tag: 'ferma-muls-' + tip,
+      msDelay: 0
+    });
   } else {
-    el.innerHTML = '⚠️ Notificările nu sunt activate. Apăsați butonul de mai jos.';
-    el.className = 'info-box warning';
+    // Fallback direct
+    new Notification(m.titlu, {
+      body: m.body,
+      icon: '/icon-192.png',
+      tag: 'ferma-muls-' + tip,
+      silent: false,
+    });
   }
 }
+
+function oraLaMs(oraStr) {
+  const now = new Date();
+  const [h, m] = oraStr.split(':').map(Number);
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return target - now;
+}
+
+function oraMinusTreiZeci(oraStr) {
+  const [h, m] = oraStr.split(':').map(Number);
+  let prH = h, prM = m - 30;
+  if (prM < 0) { prM += 60; prH = (prH - 1 + 24) % 24; }
+  return String(prH).padStart(2,'0') + ':' + String(prM).padStart(2,'0');
+}
+
+function pornestTimereMuls() {
+  [mulsTimer1,mulsTimer2,mulsTimer3,mulsTimer4,mulsTimer5,mulsTimer6].forEach(t=>{ if(t) clearTimeout(t); });
+  const s = getSetariMuls();
+  function scheduleazaMuls(oraStr, tipPrea, tipMuls) {
+    const preavizOra = oraMinusTreiZeci(oraStr);
+    const msP = oraLaMs(preavizOra);
+    const msM = oraLaMs(oraStr);
+    setTimeout(() => { trimiteNotificareMuls(tipPrea, oraStr); scheduleazaMuls(oraStr, tipPrea, tipMuls); }, msP);
+    setTimeout(() => { trimiteNotificareMuls(tipMuls, oraStr); }, msM);
+  }
+  scheduleazaMuls(s.oraDim, 'preaviz_dim', 'muls_dim');
+  scheduleazaMuls(s.oraSeara, 'preaviz_sea', 'muls_sea');
+  if (s.amiazeActiv) scheduleazaMuls(s.oraAmiaza, 'preaviz_ami', 'muls_ami');
+}
+
+window.addEventListener('load', () => {
+  if (Notification.permission === 'granted') setTimeout(pornestTimereMuls, 3000);
+});
 
 function testeazaNotificare() {
   if (Notification.permission !== 'granted') { notif('Activați mai întâi notificările!', 'warn'); return; }
-  trimiteNotificare({
-    titlu: '🐄 FermaPro – Test notificare',
-    body: 'Notificările funcționează! Veți primi alerte pentru mulsuri, fătări, deparazitări și alte evenimente.',
-    tag: 'ferma-test'
-  });
+  trimiteNotificareMuls('muls_dim', '-- test --');
   notif('Notificare test trimisă! Verificați bara de notificări.', 'ok');
 }
 
-// Inițializare notificări la pornire
-window.addEventListener('load', () => {
-  if (Notification.permission === 'granted') {
-    setTimeout(() => {
-      pornestTimereMuls();
-      pornesteScanareZilnica();
-    }, 3000);
-  }
-});
-
-// Păstrat pentru compatibilitate
+// Funcție goală păstrată pentru compatibilitate (nu mai e necesară cu SW)
 async function inregistreazaOneSignalPlayer() {}
-async function salveazaSubscriptie() {}
-function urlBase64ToUint8Array() { return new Uint8Array(); }
 
 </script>
 </body>
