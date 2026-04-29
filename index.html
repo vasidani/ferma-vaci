@@ -1004,26 +1004,63 @@ async function calcAlerte() {
             sub:'A avut călduri? Confirmați gestația acum!',
             actiune:`deschideCalduri('${m.id}','${numeVaca}')`
           });
+        else if(zile === 29)
+          alerte.push({
+            nivel:'red', categorie:'reproductie', icon:'⚠️',
+            vaca:idLabel, mesaj:`MÂINE – Confirmare gestație (ziua 30)`,
+            sub:'Pregătiți-vă să confirmați dacă vaca este gestantă sau nu',
+            actiune:`deschideCalduri('${m.id}','${numeVaca}')`
+          });
         else if(zile >= 21)
           alerte.push({
             nivel:'amber', categorie:'reproductie', icon:'⚠️',
             vaca:idLabel, mesaj:`Posibile călduri – ${zile} zile de la montă`,
             sub:'Monitorizați comportamentul – confirmare la 30 zile'
           });
+        else if(zile === 20)
+          alerte.push({
+            nivel:'amber', categorie:'reproductie', icon:'🔍',
+            vaca:idLabel, mesaj:`MÂINE – Verificați călduri (ziua 21)`,
+            sub:'Verificați rezerva de material seminal/spermă taurină pentru o posibilă remontă'
+          });
       }
 
       if(!m.gestanta_confirmata) continue;
 
-      // Pregătire repaus mamar (205–219 zile)
-      if(zile >= 205 && zile < 220)
+      // Pregătire repaus mamar (205–218 zile)
+      if(zile >= 205 && zile < 219)
         alerte.push({
           nivel:'amber', categorie:'reproductie', icon:'📅',
           vaca:idLabel, mesaj:`${zile} zile gestație – Reduceți mulsul progresiv`,
           sub:`Repaus mamar total obligatoriu la 220 zile · Fătare estimată: ${fatEst}`
         });
 
+      // Alertă cu o zi înainte de repaus mamar (ziua 219)
+      if(zile === 219)
+        alerte.push({
+          nivel:'red', categorie:'reproductie', icon:'🛑',
+          vaca:idLabel, mesaj:`MÂINE – Repaus mamar obligatoriu (ziua 220)`,
+          sub:`Opriți mulsul complet începând de mâine · Fătare estimată: ${fatEst}`
+        });
+
       // Repaus mamar activ (220–262 zile)
-      if(zile >= 220 && zile < 263)
+      if(zile >= 220 && zile < 260)
+        alerte.push({
+          nivel:'red', categorie:'reproductie', icon:'🛑',
+          vaca:idLabel, mesaj:`${zile} zile gestație – REPAUS MAMAR OBLIGATORIU`,
+          sub:`Vaca NU mai trebuie mulsă! · Fătare estimată: ${fatEst}`
+        });
+
+      // Alertă cu o zi înainte de transfer la maternitate (ziua 260)
+      if(zile === 260)
+        alerte.push({
+          nivel:'red', categorie:'reproductie', icon:'🏥',
+          vaca:idLabel, mesaj:`MÂINE – Transfer la maternitate (ziua 263)`,
+          sub:`Pregătiți boxul de maternitate · Fătare estimată: ${fatEst}`
+        });
+
+      // Repaus mamar 261–262
+      if(zile >= 261 && zile < 263)
         alerte.push({
           nivel:'red', categorie:'reproductie', icon:'🛑',
           vaca:idLabel, mesaj:`${zile} zile gestație – REPAUS MAMAR OBLIGATORIU`,
@@ -1117,58 +1154,109 @@ async function calcAlerte() {
       const crotalV = rec.vaci_lapte?.numar_crotal || '';
       const label = crotalV ? `${crotalV} – ${numeV}` : numeV;
 
-      if(rec.tip === 'deparazitare' && rec.data_urmator) {
-        const zileR = Math.floor((new Date(rec.data_urmator) - new Date()) / 86400000);
-        if(zileR < 0)
-          alerte.push({
-            nivel:'red', categorie:'sanatate', icon:'💊',
-            vaca:label, mesaj:`Deparazitare DEPĂȘITĂ cu ${Math.abs(zileR)} zile`,
-            sub:`Produs: ${rec.medicament||'–'} · Scadent: ${formatDate(rec.data_urmator)}`,
-            actiune:`openEditareSan(${rec.id})`
-          });
-        else if(zileR <= 7)
-          alerte.push({
-            nivel: zileR <= 3 ? 'red' : 'amber', categorie:'sanatate', icon:'💊',
-            vaca:label, mesaj:`Deparazitare în ${zileR === 0 ? 'AZI' : zileR + ' zile'}`,
-            sub:`Produs: ${rec.medicament||'–'} · Data: ${formatDate(rec.data_urmator)}`,
-            actiune:`openEditareSan(${rec.id})`
-          });
+      // Helper: calculează data scadentă – din data_urmator sau data+durata_zile
+      function dataScadentaSanatate(rec) {
+        if(rec.data_urmator) return rec.data_urmator;
+        if(rec.data && rec.durata_zile) return addDays(rec.data, rec.durata_zile);
+        return null;
       }
 
-      if(rec.tip === 'vaccin' && rec.data_urmator) {
-        const zileR = Math.floor((new Date(rec.data_urmator) - new Date()) / 86400000);
-        if(zileR < 0)
-          alerte.push({
-            nivel:'red', categorie:'sanatate', icon:'💉',
-            vaca:label, mesaj:`Vaccin DEPĂȘIT cu ${Math.abs(zileR)} zile`,
-            sub:`Vaccin: ${rec.medicament||'–'} · Scadent: ${formatDate(rec.data_urmator)}`,
-            actiune:`openEditareSan(${rec.id})`
-          });
-        else if(zileR <= 7)
-          alerte.push({
-            nivel: zileR <= 3 ? 'red' : 'amber', categorie:'sanatate', icon:'💉',
-            vaca:label, mesaj:`Vaccin scadent în ${zileR === 0 ? 'AZI' : zileR + ' zile'}`,
-            sub:`Vaccin: ${rec.medicament||'–'} · Data: ${formatDate(rec.data_urmator)}`,
-            actiune:`openEditareSan(${rec.id})`
-          });
+      if(rec.tip === 'deparazitare') {
+        const scadent = dataScadentaSanatate(rec);
+        if(scadent) {
+          const zileR = Math.floor((new Date(scadent) - new Date()) / 86400000);
+          if(zileR < 0)
+            alerte.push({
+              nivel:'red', categorie:'sanatate', icon:'💊',
+              vaca:label, mesaj:`Deparazitare DEPĂȘITĂ cu ${Math.abs(zileR)} zile`,
+              sub:`Produs: ${rec.medicament||'–'} · Scadent: ${formatDate(scadent)}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR === 0)
+            alerte.push({
+              nivel:'red', categorie:'sanatate', icon:'💊',
+              vaca:label, mesaj:`Deparazitare AZI!`,
+              sub:`Produs: ${rec.medicament||'–'} · Efectuați deparazitarea azi`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR === 1)
+            alerte.push({
+              nivel:'amber', categorie:'sanatate', icon:'💊',
+              vaca:label, mesaj:`Deparazitare MÂINE – verificați stocul!`,
+              sub:`Produs: ${rec.medicament||'–'} · Data: ${formatDate(scadent)}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR <= 7)
+            alerte.push({
+              nivel:'amber', categorie:'sanatate', icon:'💊',
+              vaca:label, mesaj:`Deparazitare în ${zileR} zile`,
+              sub:`Produs: ${rec.medicament||'–'} · Data: ${formatDate(scadent)}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+        }
       }
 
-      if(rec.tip === 'tratament' && !rec.finalizat && rec.data_urmator) {
-        const zileR = Math.floor((new Date(rec.data_urmator) - new Date()) / 86400000);
-        if(zileR === 0)
-          alerte.push({
-            nivel:'red', categorie:'sanatate', icon:'💊',
-            vaca:label, mesaj:`Doză tratament AZI`,
-            sub:`${rec.diagnostic||''} · ${rec.medicament||''} ${rec.doza ? '· ' + rec.doza : ''}`,
-            actiune:`openEditareSan(${rec.id})`
-          });
-        else if(zileR < 0 && zileR >= -3)
-          alerte.push({
-            nivel:'amber', categorie:'sanatate', icon:'💊',
-            vaca:label, mesaj:`Doză tratament depășită cu ${Math.abs(zileR)} zile`,
-            sub:`${rec.diagnostic||''} · ${rec.medicament||''}`,
-            actiune:`openEditareSan(${rec.id})`
-          });
+      if(rec.tip === 'vaccin') {
+        const scadent = dataScadentaSanatate(rec);
+        if(scadent) {
+          const zileR = Math.floor((new Date(scadent) - new Date()) / 86400000);
+          if(zileR < 0)
+            alerte.push({
+              nivel:'red', categorie:'sanatate', icon:'💉',
+              vaca:label, mesaj:`Vaccin DEPĂȘIT cu ${Math.abs(zileR)} zile`,
+              sub:`Vaccin: ${rec.medicament||'–'} · Scadent: ${formatDate(scadent)}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR === 0)
+            alerte.push({
+              nivel:'red', categorie:'sanatate', icon:'💉',
+              vaca:label, mesaj:`Vaccin AZI!`,
+              sub:`Vaccin: ${rec.medicament||'–'} · Efectuați vaccinarea azi`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR === 1)
+            alerte.push({
+              nivel:'amber', categorie:'sanatate', icon:'💉',
+              vaca:label, mesaj:`Vaccin MÂINE – pregătiți doza!`,
+              sub:`Vaccin: ${rec.medicament||'–'} · Data: ${formatDate(scadent)}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR <= 7)
+            alerte.push({
+              nivel:'amber', categorie:'sanatate', icon:'💉',
+              vaca:label, mesaj:`Vaccin scadent în ${zileR} zile`,
+              sub:`Vaccin: ${rec.medicament||'–'} · Data: ${formatDate(scadent)}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+        }
+      }
+
+      if(rec.tip === 'tratament' && !rec.finalizat) {
+        const scadent = dataScadentaSanatate(rec);
+        if(scadent) {
+          const zileR = Math.floor((new Date(scadent) - new Date()) / 86400000);
+          if(zileR === 0)
+            alerte.push({
+              nivel:'red', categorie:'sanatate', icon:'💊',
+              vaca:label, mesaj:`Doză tratament AZI`,
+              sub:`${rec.diagnostic||''} · ${rec.medicament||''} ${rec.doza ? '· ' + rec.doza : ''}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR === 1)
+            alerte.push({
+              nivel:'amber', categorie:'sanatate', icon:'💊',
+              vaca:label, mesaj:`Doză tratament MÂINE`,
+              sub:`${rec.diagnostic||''} · ${rec.medicament||''} ${rec.doza ? '· ' + rec.doza : ''}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+          else if(zileR < 0 && zileR >= -3)
+            alerte.push({
+              nivel:'amber', categorie:'sanatate', icon:'💊',
+              vaca:label, mesaj:`Doză tratament depășită cu ${Math.abs(zileR)} zile`,
+              sub:`${rec.diagnostic||''} · ${rec.medicament||''}`,
+              actiune:`openEditareSan(${rec.id})`
+            });
+        }
       }
 
       // Carantină lapte activă
@@ -1634,7 +1722,7 @@ async function raspundeCalduri(avutCalduri) {
   closeModal('dlgCalduri');
   if(!calduriMontaId) return;
   if(avutCalduri) {
-    await db.from('monte').update({a_avut_calduri_30:true}).eq('id',calduriMontaId);
+    await db.from('monte').update({a_avut_calduri_30:true, fatare_finalizata:true}).eq('id',calduriMontaId);
     const { data:m } = await db.from('monte').select('vaca_id').eq('id',calduriMontaId).single();
     if(m) await db.from('vaci_lapte').update({stare:'lactatie'}).eq('id',m.vaca_id);
     notif('Vaca marcată ne-gestantă. Programați o nouă montă.','warn');
